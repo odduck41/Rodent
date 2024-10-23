@@ -1,9 +1,10 @@
 cmake_minimum_required(VERSION 3.28.1)
-project(Rodent C)
+project(Rodent)
 
-set(CMAKE_C_STANDARD 11)
+set(CMAKE_CXX_STANDARD 20)
 
 add_executable(Rodent
-        main.c
-        lexer.h
+        main.cpp
+        lexer.hpp
+        lexer.cpp
 )

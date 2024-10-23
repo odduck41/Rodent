@@ -1,11 +1,9 @@
 #pragma once
-#include <stdbool.h>
 
 #ifndef RODENT_LEXER_H
 #define RODENT_LEXER_H
 
-#define new(T) (T*)malloc(sizeof(T))
-#define delete(T) free(T)
+#include <cstddef>
 
 struct Trie {
   struct Trie* children[26];
@@ -17,7 +15,7 @@ enum Type {
   identifier,     // Идентификатор
   literal,        // Литерал
   s_literal,      // Строковый литерал
-  operation,      // Опрератор
+  operation,      // Оператор
   punctuation,    // Пунктуация
   point,          // Точка
   comma,          // Запятая
@@ -25,11 +23,14 @@ enum Type {
 };
 
 struct Token {
-  enum Type type;
-  char* content;
-  size_t line;
+  enum Type type{};
+  char* content{};
+  size_t line{};
 };
 
+extern Trie* reserved_;
+
+void add();
 void load();
 void tokenize();
 
