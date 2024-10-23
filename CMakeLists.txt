@@ -7,4 +7,5 @@ add_executable(Rodent
         main.cpp
         lexer.hpp
         lexer.cpp
+        tests.h
 )

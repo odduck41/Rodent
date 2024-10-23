@@ -1,13 +1,10 @@
 #pragma once
 
-#ifndef RODENT_LEXER_H
-#define RODENT_LEXER_H
-
 #include <cstddef>
 
 struct Trie {
-  struct Trie* children[26];
-  bool terminal;
+  Trie* children[26]{};
+  bool terminal{};
 };
 
 enum Type {
@@ -30,8 +27,8 @@ struct Token {
 
 extern Trie* reserved_;
 
-void add();
 void load();
+void add(Trie*&, char);
+void addAll(const char*);
+bool inTrie(const char*, size_t = 0, const Trie* = reserved_);
 void tokenize();
-
-#endif //RODENT_LEXER_H
