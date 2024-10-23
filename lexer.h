@@ -16,21 +16,21 @@ struct Trie {
 };
 
 enum Type {
-  reserved,
-  identifier,
-  literal,
-  s_literal,
-  operation,
-  punctuation,
-  point,
-  comma,
-  brackets
+  reserved,       // Зарезервированные символы
+  identifier,     // Идентификатор
+  literal,        // Литерал
+  s_literal,      // Строковый литерал
+  operation,      // Опрератор
+  punctuation,    // Пунктуация
+  point,          // Точка
+  comma,          // Запятая
+  parentheses     // Круглые скобки
 };
 
-struct token {
+struct Token {
   enum Type type;
   char* content;
-  int line;
+  size_t line;
 };
 
 void load();
