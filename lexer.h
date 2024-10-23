@@ -1,11 +1,8 @@
-#include <malloc.h>
+#pragma once
+#include <stdbool.h>
 
 #ifndef RODENT_LEXER_H
 #define RODENT_LEXER_H
-
-#define bool char
-#define true 1
-#define false 0
 
 #define new(T) (T*)malloc(sizeof(T))
 #define delete(T) free(T)
