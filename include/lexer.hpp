@@ -11,6 +11,7 @@ enum Lexeme {
   reserved,       // Зарезервированные символы
   identifier,     // Идентификатор
   literal,        // Литерал
+  type,           // Тип
   s_literal,      // Строковый литерал
   operation,      // Оператор
   punctuation,    // Пунктуация
@@ -21,7 +22,7 @@ enum Lexeme {
 
 struct Token {
   Lexeme type{};
-  char* content{};
+  const char* content{};
   size_t line{};
 };
 
