@@ -10,6 +10,9 @@ add_executable(Rodent
         source/lexer.cpp
 
         include/tests.h
+
+        include/finiteStateMachine.hpp
+        source/finiteStateMachine.cpp
 )
 
 include_directories(
