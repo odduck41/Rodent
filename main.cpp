@@ -4,7 +4,7 @@
 
 
 int main(int argc, char** argv) {
-    load();
+    load_reserved();
     test();
     return 0;
 }

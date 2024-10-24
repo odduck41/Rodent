@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>
+#include <string>
 
 struct Trie {
   Trie* children[26]{};
@@ -26,9 +27,14 @@ struct Token {
 };
 
 extern Trie* reserved_;
+extern Trie* types_;
 
-void load();
+void load_reserved();
+void load_basic_types();
+
 void add(Trie*&, char);
-void addAll(const char*);
+void addAll(const char*, Trie*);
+
 bool inTrie(const char*, size_t = 0, const Trie* = reserved_);
-void tokenize();
+
+std::string tokenize(const char* from);

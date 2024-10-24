@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <iostream>
 #include <variant>
+#include <vector>
 
 namespace lexer
 {
@@ -151,7 +152,7 @@ namespace lexer
         FSM(const char* text);
 
         ~FSM() = default;
-
+        std::vector<
     private:
         const char* text_;
 
