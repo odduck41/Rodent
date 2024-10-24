@@ -5,7 +5,13 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_executable(Rodent
         main.cpp
-        lexer.hpp
-        lexer.cpp
-        tests.h
+
+        include/lexer.hpp
+        source/lexer.cpp
+
+        include/tests.h
+)
+
+include_directories(
+        include
 )

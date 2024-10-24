@@ -1,5 +1,5 @@
 #include "lexer.hpp"
-#include "tests.h"
+#include "include/tests.h"
 
 
 

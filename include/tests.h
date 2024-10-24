@@ -1,5 +1,5 @@
 #pragma once
-#include "lexer.hpp"
+#include <lexer.hpp>
 
 #include <iostream>
 void test() {

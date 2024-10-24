@@ -7,7 +7,7 @@ struct Trie {
   bool terminal{};
 };
 
-enum Type {
+enum Lexeme {
   reserved,       // Зарезервированные символы
   identifier,     // Идентификатор
   literal,        // Литерал
@@ -20,7 +20,7 @@ enum Type {
 };
 
 struct Token {
-  enum Type type{};
+  Lexeme type{};
   char* content{};
   size_t line{};
 };
