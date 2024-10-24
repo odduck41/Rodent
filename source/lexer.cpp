@@ -5,12 +5,15 @@ Trie* reserved_ = new Trie;
 
 void load() {
     std::ifstream is("../reserved.txt");
-    char* lines = new char[92];
+    is.seekg(0, std::ios::end);
+    const long long sz = is.tellg();
 
+    char* lines = new char[sz];
 
-    is.read(lines, 91);
+    is.seekg(0, std::ios::beg);
+    is.read(lines, sz);
 
-    lines[91] = '\0';
+    lines[sz - 1] = '\0';
 
     addAll(lines);
 
@@ -44,8 +47,10 @@ bool inTrie(const char* word, size_t current, const Trie* level) {
         return false;
     }
 
-    if (word[current] == '\0') {
+    if (word[current] == '\0' && level->terminal) {
         return true;
+    } else if (word[current] == '\0') {
+        return false;
     }
 
     return level->children[word[current] - 'a'] != nullptr
