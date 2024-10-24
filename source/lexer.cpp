@@ -85,7 +85,7 @@ std::string tokenize(const char* from) {
 
     lines[sz] = '\0';
 
-    lexer::FSM state_machine(lines);
+    lexer::FSM state_machine(lines, sz);
 
     std::string ret;
 
