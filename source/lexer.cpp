@@ -4,16 +4,15 @@
 Trie* reserved_ = new Trie;
 
 void load() {
-    std::ifstream is("../reserved.txt");
-    is.seekg(0, std::ios::end);
+    std::ifstream is("../reserved.txt", std::ifstream::ate | std::ifstream::binary);
     const long long sz = is.tellg();
 
-    char* lines = new char[sz];
+    char* lines = new char[sz + 1];
 
     is.seekg(0, std::ios::beg);
     is.read(lines, sz);
 
-    lines[sz - 1] = '\0';
+    lines[sz] = '\0';
 
     addAll(lines);
 
@@ -23,7 +22,7 @@ void load() {
 void addAll(const char* lines) {
     Trie* current = reserved_;
     for (size_t i = 0; lines[i] != '\0'; ++i) {
-        if (lines[i] != ' ' && lines[i] != '\n') {
+        if (lines[i] != ' ' && lines[i] != '\n' && lines[i] != '\r') {
             add(current, lines[i]);
         } else {
             current = reserved_;
