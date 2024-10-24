@@ -14,7 +14,7 @@ enum Lexeme {
   s_literal,      // Строковый литерал
   operation,      // Оператор
   punctuation,    // Пунктуация
-  point,          // Точка
+  dot,            // Точка
   comma,          // Запятая
   parentheses     // Круглые скобки
 };
