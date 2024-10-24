@@ -1,11 +1,7 @@
 #include "lexer.hpp"
-#include "include/tests.h"
-
-
+#include "include/common.hpp"
 
 int main(int argc, char** argv) {
-    load_reserved();
-    load_basic_types();
-    test();
+    starter(argv[argc - 1]);
     return 0;
 }

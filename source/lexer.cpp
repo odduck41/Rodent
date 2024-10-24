@@ -87,8 +87,15 @@ std::string tokenize(const char* from) {
 
     lexer::FSM state_machine(lines);
 
+    auto lexemes = state_machine.getLexems();
+
     std::string ret;
 
+    for (auto& token : lexemes) {
+        ret += "<Type: " + std::to_string(token.type) +
+                ", Content: " + std::string(token.content) +
+                ", Line: " + std::to_string(token.line) + ">\n";
+    }
 
     delete[] lines;
 
