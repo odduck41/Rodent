@@ -1,29 +1,46 @@
 #include <lexer.hpp>
+#include <finiteStateMachine.hpp>
 #include <fstream>
 
 Trie* reserved_ = new Trie;
+Trie* types_ = new Trie;
 
-void load() {
-    std::ifstream is("../reserved.txt");
-    is.seekg(0, std::ios::end);
+void load_reserved() {
+    std::ifstream is("../reserved.txt", std::ifstream::ate | std::ifstream::binary);
     const long long sz = is.tellg();
 
-    char* lines = new char[sz];
+    char* lines = new char[sz + 1];
 
     is.seekg(0, std::ios::beg);
     is.read(lines, sz);
 
-    lines[sz - 1] = '\0';
+    lines[sz] = '\0';
 
-    addAll(lines);
+    addAll(lines, reserved_);
 
     delete[] lines;
 }
 
-void addAll(const char* lines) {
-    Trie* current = reserved_;
+void load_basic_types() {
+    std::ifstream is("../types.txt", std::ifstream::ate | std::ifstream::binary);
+    const long long sz = is.tellg();
+
+    char* lines = new char[sz + 1];
+
+    is.seekg(0, std::ios::beg);
+    is.read(lines, sz);
+
+    lines[sz] = '\0';
+
+    addAll(lines, types_);
+
+    delete[] lines;
+}
+
+void addAll(const char* lines, Trie* cur) {
+    Trie* current = cur;
     for (size_t i = 0; lines[i] != '\0'; ++i) {
-        if (lines[i] != ' ' && lines[i] != '\n') {
+        if (lines[i] != ' ' && lines[i] != '\n' && lines[i] != '\r') {
             add(current, lines[i]);
         } else {
             current = reserved_;
@@ -56,3 +73,25 @@ bool inTrie(const char* word, size_t current, const Trie* level) {
     return level->children[word[current] - 'a'] != nullptr
     && inTrie(word, current + 1, level->children[word[current] - 'a']);
 }
+
+std::string tokenize(const char* from) {
+    std::ifstream is(from, std::ifstream::ate | std::ifstream::binary);
+    const long long sz = is.tellg();
+
+    char* lines = new char[sz + 1];
+
+    is.seekg(0, std::ios::beg);
+    is.read(lines, sz);
+
+    lines[sz] = '\0';
+
+    lexer::FSM state_machine(lines);
+
+    std::string ret;
+
+
+    delete[] lines;
+
+    return ret;
+}
+
