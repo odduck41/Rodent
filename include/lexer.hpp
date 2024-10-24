@@ -36,6 +36,6 @@ void load_basic_types();
 void add(Trie*&, char);
 void addAll(const char*, Trie*);
 
-bool inTrie(const char*, size_t = 0, const Trie* = reserved_);
+bool inTrie(const char*, const Trie*, size_t = 0);
 
 std::string tokenize(const char* from);

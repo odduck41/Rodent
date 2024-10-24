@@ -163,7 +163,6 @@ namespace lexer
         std::vector<Token> getLexems();
 
         ~FSM() = default;
-        std::vector<
     private:
         const char* text_;
         std::vector<Token> lexems_;

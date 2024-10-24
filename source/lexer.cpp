@@ -43,7 +43,7 @@ void addAll(const char* lines, Trie* cur) {
         if (lines[i] != ' ' && lines[i] != '\n' && lines[i] != '\r') {
             add(current, lines[i]);
         } else {
-            current = reserved_;
+            current = cur;
         }
     }
 }
@@ -59,7 +59,7 @@ void add(Trie*& level, char cur) {
     level = level->children[cur - 'a'];
 }
 
-bool inTrie(const char* word, size_t current, const Trie* level) {
+bool inTrie(const char* word, const Trie* level, size_t current) {
     if (level->terminal && word[current] != '\0') {
         return false;
     }
@@ -71,7 +71,7 @@ bool inTrie(const char* word, size_t current, const Trie* level) {
     }
 
     return level->children[word[current] - 'a'] != nullptr
-    && inTrie(word, current + 1, level->children[word[current] - 'a']);
+    && inTrie(word, level->children[word[current] - 'a'], current + 1);
 }
 
 std::string tokenize(const char* from) {
