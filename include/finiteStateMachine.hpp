@@ -129,23 +129,23 @@ class FSM {
 
 
     // From Begin
-    void onEvent(State::Begin s, Event::Semicolon e) {
+    void onEvent(States::Begin s, Events::Semicolon e) {
         std::cout << "yy" << '\n';
     };
-    // void onEvent(State::Begin, Event::CloseCurly);
-    // void onEvent(State::Begin, Event::Letter);
-    // void onEvent(State::Begin, Event::Number);
+    void onEvent(States::Begin, Events::CloseCurly);
+    void onEvent(States::Begin, Events::Letter);
+    void onEvent(States::Begin, Events::Number);
 
     // From RTI 
-    // void onEvent(States::State::RTI, Events::Event::Number);
-    // void onEvent(States::State::RTI, Events::Event::Letter);
-    // void onEvent(States::State::RTI, Events::Event::Dot);
-    // void onEvent(States::State::RTI, Events::Event::Underline);
-    // void onEvent(States::State::RTI, Events::Event::Colon);
-    // void onEvent(States::State::RTI, Events::Event::OpenCurly);
-    // void onEvent(States::State::RTI, Events::Event::Punctuation);
-    // void onEvent(States::State::RTI, Events::Event::OpenParentheses);
-    // void onEvent(States::State::RTI, Events::Event::Space);
+    void onEvent(States::RTI, Events::Number);
+    void onEvent(States::RTI, Events::Letter);
+    void onEvent(States::RTI, Events::Dot);
+    void onEvent(States::RTI, Events::Underline);
+    void onEvent(States::RTI, Events::Colon);
+    void onEvent(States::RTI, Events::OpenCurly);
+    void onEvent(States::RTI, Events::Punctuation);
+    void onEvent(States::RTI, Events::OpenParentheses);
+    void onEvent(States::RTI, Events::Space);
 
 
     void onEvent(State state, Event event) { // Default implementation (throw logic_error)
