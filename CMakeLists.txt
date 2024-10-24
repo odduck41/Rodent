@@ -14,6 +14,7 @@ add_executable(Rodent
         include/finiteStateMachine.hpp
         source/finiteStateMachine.cpp
         include/common.hpp
+        include/FSM.hpp
 )
 
 include_directories(
