@@ -1,5 +1,5 @@
 return func
 while for do continue break
-if else elif
+if else elif switch case
 enum union class private public
 import
