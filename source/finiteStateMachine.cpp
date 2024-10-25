@@ -526,3 +526,119 @@ lexer::State lexer::FSM::onEvent(States::EndOfStringLiteral const& state, Events
 {
     return States::Begin{};
 }
+
+
+std::vector<Token> lexer::operations(const std::string& a, size_t line) {
+    std::vector<Token> ret;
+    size_t index = 0;
+    while (index < a.size()) {
+        if (a[index] == '+') {
+            if (index + 1 < a.size() &&
+                (a[index + 1] == '+' || a[index + 1] == '=')) {
+                ret.push_back(Token{
+                    operation,
+                    a.substr(index, 2),
+                    line
+                });
+                index += 2;
+            } else {
+                ret.push_back(Token{
+                     operation,
+                     std::string(1, a[index]),
+                     line
+                 });
+                ++index;
+            }
+        }
+        else if (a[index] == '-') {
+            if (index + 1 < a.size() &&
+                (a[index + 1] == '-' || a[index + 1] == '=')) {
+                    ret.push_back(Token{
+                        operation,
+                        a.substr(index, 2),
+                        line
+                    });
+                    index += 2;
+                } else {
+                    ret.push_back(Token{
+                         operation,
+                         std::string(1, a[index]),
+                         line
+                     });
+                    ++index;
+                }
+        }
+        else if (a[index] == '*' || a[index] == '/' || a[index] == '=' || a[index] == '!') {
+            if (index + 1 < a.size() && a[index + 1] == '=') {
+                ret.push_back(Token{
+                        operation,
+                        a.substr(index, 2),
+                        line
+                    });
+                index += 2;
+            } else {
+                ret.push_back(Token{
+                         operation,
+                         std::string(1, a[index]),
+                         line
+                });
+                ++index;
+            }
+        }
+        else if (a[index] == '&' || a[index] == '|') {
+            if (index + 1 < a.size() &&
+                (a[index + 1] == a[index] || a[index + 1] == '=')) {
+                ret.push_back(Token{
+                        operation,
+                        a.substr(index, 2),
+                        line
+                });
+                index += 2;
+            } else {
+                ret.push_back(Token{
+                         operation,
+                         std::string(1, a[index]),
+                         line
+                });
+                ++index;
+            }
+        }
+        else if (a[index] == '<' || a[index] == '>') {
+            if (index + 1 < a.size() && a[index + 1] == '='
+                || a[index + 1] == a[index]) {
+                if (index + 2 < a.size() && a[index + 1] == a[index]
+                    && a[index + 2] == '=') {
+                    ret.push_back(Token{
+                        operation,
+                        a.substr(index, 3),
+                        line
+                });
+                    index += 3;
+                } else {
+                    ret.push_back(Token{
+                        operation,
+                        a.substr(index, 2),
+                        line
+                });
+                    index += 2;
+                }
+            } else {
+                ret.push_back(Token{
+                         operation,
+                         std::string(1, a[index]),
+                         line
+                });
+                ++index;
+            }
+        }
+        else {
+            ret.push_back(Token{
+                         operation,
+                         std::string(1, a[index]),
+                         line
+            });
+            ++index;
+        }
+    }
+    return ret;
+}

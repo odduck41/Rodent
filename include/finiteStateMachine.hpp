@@ -8,7 +8,7 @@
 
 namespace lexer
 {
-    inline std::vector<Token> operations(const std::string&, size_t) {return {};} // +=#
+    std::vector<Token> operations(const std::string&, size_t);
 
     namespace States
     {
