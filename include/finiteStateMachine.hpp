@@ -8,7 +8,8 @@
 
 namespace lexer
 {
-    std::vector<Token> operations(const std::string&, size_t); // +=#
+    inline std::vector<Token> operations(const std::string&, size_t) {return {};} // +=#
+
     namespace States
     {
         struct Begin

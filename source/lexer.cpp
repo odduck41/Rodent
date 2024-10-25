@@ -59,6 +59,31 @@ void add(Trie*& level, char cur) {
     level = level->children[cur - 'a'];
 }
 
+void removeComments(const char*& line) {
+    std::string str(line);
+    std::string result;
+    bool inLineComment = false;
+
+    for (size_t i = 0; i < str.length(); ++i) {
+        if (inLineComment) {
+            if (str[i] == '\n') {
+                inLineComment = false;
+                result += str[i];
+            }
+        } else {
+            if (str[i] == '/' && i + 1 < str.length() && str[i + 1] == '/') {
+                inLineComment = true;
+                ++i;
+            } else {
+                result += str[i];
+            }
+        }
+    }
+
+    line = result.c_str();
+}
+
+
 bool inTrie(const char* word, const Trie* level, size_t current) {
     if (level->terminal && word[current] != '\0') {
         return false;
