@@ -15,7 +15,7 @@ void lexer::FSM::processText()
     while (curr_symbol < text_ + text_length_)
     {
         Event event = getEvent(*curr_symbol);
-        curr_state = onEvent(curr_state, event);
+        curr_state = processEvent(curr_state, event);
         ++curr_symbol;
     }
 }
@@ -147,7 +147,7 @@ lexer::State lexer::FSM::processEvent(State const &state, Event const &event)
 }
 
 
-lexer::State lexer::FSM::onEvent(State&, Event&)
+lexer::State lexer::FSM::onEvent(State const &, Event const &)
 {
     throw std::logic_error("Default instatnce of onEvent has been called");
 }
