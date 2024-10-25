@@ -36,13 +36,7 @@ Token lexer::FSM::applyState(const State& state) const
 
 std::vector<Token> lexer::FSM::applyState(const States::Operation& state) const
 {
-    return {
-        {
-            Lexeme::operation,
-            state.curr_str,
-            line_
-        }
-    };
+    return operations(state.curr_str, line_);
 }
 
 Token lexer::FSM::applyState(const States::Literal& state) const
