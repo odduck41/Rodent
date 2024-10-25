@@ -23,7 +23,7 @@ enum Lexeme {
 
 struct Token {
   Lexeme type{};
-  const char* content{};
+  std::string content;
   size_t line{};
 };
 

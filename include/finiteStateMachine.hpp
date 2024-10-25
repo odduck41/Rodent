@@ -228,9 +228,13 @@ namespace lexer
         // From Begin
         State onEvent(States::Begin const& state, Events::Semicolon const& event);
         State onEvent(States::Begin const& state, Events::Colon const& event);
+        State onEvent(States::Begin const& state, Events::OpenCurly const& event);
         State onEvent(States::Begin const& state, Events::CloseCurly const& event);
         State onEvent(States::Begin const& state, Events::Letter const& event);
+        State onEvent(States::Begin const& state, Events::Space const& event);
+        State onEvent(States::Begin const& state, Events::CloseParentheses const& event);
         State onEvent(States::Begin const& state, Events::Number const& event);
+        State onEvent(States::Begin const& state, Events::Operation const& event);
         State onEvent(States::Begin const& state, Events::OpenParentheses const& event);
 
         // From RTI
@@ -241,6 +245,7 @@ namespace lexer
         State onEvent(States::RTI const& state, Events::Letter const& event);
         State onEvent(States::RTI const& state, Events::Colon const& event);
         State onEvent(States::RTI const& state, Events::OpenCurly const& event);
+        State onEvent(States::RTI const& state, Events::CloseParentheses const& event);
         State onEvent(States::RTI const& state, Events::Punctuation const& event);
         State onEvent(States::RTI const& state, Events::Operation const& event);
         State onEvent(States::RTI const& state, Events::OpenParentheses const& event);
@@ -250,17 +255,21 @@ namespace lexer
         State onEvent(States::Parentheses const& state, Events::Letter const& event);
         State onEvent(States::Parentheses const& state, Events::OpenParentheses const& event);
         State onEvent(States::Parentheses const& state, Events::CloseParentheses const& event);
+        State onEvent(States::Parentheses const& state, Events::Space const& event);
         State onEvent(States::Parentheses const& state, Events::Semicolon const& event);
 
         // From EndOfParentheses
         State onEvent(States::EndOfParentheses const& state, Events::CloseParentheses const& event);
         State onEvent(States::EndOfParentheses const& state, Events::Semicolon const& event);
+        State onEvent(States::EndOfParentheses const& state, Events::Space const& event);
 
         // From Operation
         State onEvent(States::Operation const& state, Events::Letter const& event);
         State onEvent(States::Operation const& state, Events::Number const& event);
         State onEvent(States::Operation const& state, Events::Quote const& event);
+        State onEvent(States::Operation const& state, Events::Space const& event);
         State onEvent(States::Operation const& state, Events::Semicolon const& event);
+        State onEvent(States::Operation const& state, Events::Operation const& event);
 
         // From Literal
         State onEvent(States::Literal const& state, Events::Number const& event);
