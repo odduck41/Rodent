@@ -8,6 +8,7 @@
 
 namespace lexer
 {
+    std::vector<Token> operations(const std::string&); // +=#
     namespace States
     {
         struct Begin
@@ -209,7 +210,7 @@ namespace lexer
         [[nodiscard]]
         Token applyState(const States::RTI& state) const;
         [[nodiscard]]
-        Token applyState(const States::Operation& state) const;
+        std::vector<Token> applyState(const States::Operation& state) const;
         [[nodiscard]]
         Token applyState(const States::Literal& state) const;
         [[nodiscard]]
@@ -275,6 +276,8 @@ namespace lexer
         State onEvent(States::Literal const& state, Events::Number const& event);
         State onEvent(States::Literal const& state, Events::Dot const& event);
         State onEvent(States::Literal const& state, Events::Semicolon const& event);
+        State onEvent(States::Literal const& state, Events::Space const& event);
+        State onEvent(States::Literal const& state, Events::Operation const& event);
 
         // From String_literal
         State onEvent(States::String_literal const& state, Events::Quote const& event);

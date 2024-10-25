@@ -16,7 +16,8 @@ void lexer::FSM::processText()
 
     while (curr_symbol < text_ + text_length_)
     {
-        if (*curr_symbol == '\n' || *curr_symbol == '\r') {
+        if (*curr_symbol == '\n' || *curr_symbol == '\r')
+        {
             ++line_;
             ++curr_symbol;
             continue;
@@ -33,12 +34,14 @@ Token lexer::FSM::applyState(const State& state) const
     throw std::logic_error("Default instatnce of applyState has been called");
 }
 
-Token lexer::FSM::applyState(const States::Operation& state) const
+std::vector<Token> lexer::FSM::applyState(const States::Operation& state) const
 {
     return {
-        Lexeme::operation,
-        state.curr_str,
-        line_
+        {
+            Lexeme::operation,
+            state.curr_str,
+            line_
+        }
     };
 }
 
@@ -122,7 +125,7 @@ lexer::Event lexer::FSM::getEvent(const char symbol)
     if (symbol == '"' || symbol == '\'') return lexer::Events::Quote{symbol};
     if (symbol >= 'a' && symbol <= 'z') return lexer::Events::Letter{symbol};
     if (symbol >= 'A' && symbol <= 'Z') return lexer::Events::Letter{symbol};
-    if (symbol >= '0' && symbol <= '1') return lexer::Events::Number{symbol};
+    if (symbol >= '0' && symbol <= '9') return lexer::Events::Number{symbol};
     if (symbol == '!' || symbol == '%' || symbol == '^' || symbol == '&' || symbol == '*' || symbol == '/' ||
         symbol == '+' || symbol == '-' || symbol == '<' || symbol == '>' || symbol == '=')
         return lexer::Events::Operation{symbol};
@@ -137,12 +140,12 @@ std::vector<Token> lexer::FSM::getLexems()
 }
 
 
-lexer::State lexer::FSM::processEvent(State const &state, Event const &event)
+lexer::State lexer::FSM::processEvent(State const& state, Event const& event)
 {
     State result;
     std::visit(
         overload{
-            [this, &result](auto const &state_, auto const &event_)
+            [this, &result](auto const& state_, auto const& event_)
             {
                 result = onEvent(state_, event_);
             }
@@ -154,61 +157,67 @@ lexer::State lexer::FSM::processEvent(State const &state, Event const &event)
 }
 
 
-lexer::State lexer::FSM::onEvent(State const &, Event const &)
+lexer::State lexer::FSM::onEvent(State const&, Event const&)
 {
     throw std::logic_error("Default instatnce of onEvent has been called");
 }
 
-lexer::State lexer::FSM::onEvent(States::Begin const &state, Events::Letter const &event)
+lexer::State lexer::FSM::onEvent(States::Begin const& state, Events::Letter const& event)
 {
     return States::RTI{std::string(1, event.symbol)};
 }
 
-lexer::State lexer::FSM::onEvent(States::Begin const &state, Events::Number const &event)
+lexer::State lexer::FSM::onEvent(States::Begin const& state, Events::Number const& event)
 {
     return States::Literal{std::string(1, event.symbol)};
 }
 
-lexer::State lexer::FSM::onEvent(States::Begin const &state, Events::Space const &event)
+lexer::State lexer::FSM::onEvent(States::Begin const& state, Events::Space const& event)
 {
     return States::Begin{};
 }
 
-lexer::State lexer::FSM::onEvent(States::Begin const &state, Events::Semicolon const &event)
+lexer::State lexer::FSM::onEvent(States::Begin const& state, Events::Semicolon const& event)
 {
     return States::Begin{};
 }
 
-lexer::State lexer::FSM::onEvent(States::Begin const &state, Events::Colon const &event)
+lexer::State lexer::FSM::onEvent(States::Begin const& state, Events::Colon const& event)
 {
     return States::Operation{std::to_string(event.symbol)};
 }
 
-lexer::State lexer::FSM::onEvent(States::Begin const &state, Events::Operation const &event)
+lexer::State lexer::FSM::onEvent(States::Begin const& state, Events::Operation const& event)
 {
     return States::Operation{std::string(1, event.symbol)};
 }
 
-lexer::State lexer::FSM::onEvent(States::Begin const &state, Events::CloseCurly const &event)
+lexer::State lexer::FSM::onEvent(States::Begin const& state, Events::CloseCurly const& event)
 {
-    lexems_.push_back(applyState(States::Operation("}")));
+    for(Token& token : applyState(States::Operation("}")))
+    {
+        lexems_.push_back(token);
+    }
 
     return States::Begin{};
 }
 
-lexer::State lexer::FSM::onEvent(States::Begin const &state, Events::OpenCurly const &event)
+lexer::State lexer::FSM::onEvent(States::Begin const& state, Events::OpenCurly const& event)
 {
-    lexems_.push_back(applyState(States::Operation("{")));
+    for(Token& token : applyState(States::Operation("{")))
+    {
+        lexems_.push_back(token);
+    }
 
     return States::Begin{};
 }
 
-lexer::State lexer::FSM::onEvent(States::Begin const &state, Events::OpenParentheses const &event)
+lexer::State lexer::FSM::onEvent(States::Begin const& state, Events::OpenParentheses const& event)
 {
     return States::Parentheses{};
 }
 
-lexer::State lexer::FSM::onEvent(States::Begin const &state, Events::CloseParentheses const &event)
+lexer::State lexer::FSM::onEvent(States::Begin const& state, Events::CloseParentheses const& event)
 {
     applyState(States::Operation(")"));
 
@@ -216,78 +225,78 @@ lexer::State lexer::FSM::onEvent(States::Begin const &state, Events::CloseParent
 }
 
 
-lexer::State lexer::FSM::onEvent(States::RTI const &state, Events::Dot const &event)
+lexer::State lexer::FSM::onEvent(States::RTI const& state, Events::Dot const& event)
 {
     lexems_.push_back(applyState(state));
 
     return States::RTI{};
 }
 
-lexer::State lexer::FSM::onEvent(States::RTI const &state, Events::Space const &event)
+lexer::State lexer::FSM::onEvent(States::RTI const& state, Events::Space const& event)
 {
     lexems_.push_back(applyState(state));
 
     return States::Begin{};
 }
 
-lexer::State lexer::FSM::onEvent(States::RTI const &state, Events::Number const &event)
+lexer::State lexer::FSM::onEvent(States::RTI const& state, Events::Number const& event)
 {
     return States::RTI{state.curr_str + event.symbol};
 }
 
-lexer::State lexer::FSM::onEvent(States::RTI const &state, Events::Underline const &event)
+lexer::State lexer::FSM::onEvent(States::RTI const& state, Events::Underline const& event)
 {
     return States::RTI{state.curr_str + event.symbol};
 }
 
-lexer::State lexer::FSM::onEvent(States::RTI const &state, Events::CloseParentheses const &event)
+lexer::State lexer::FSM::onEvent(States::RTI const& state, Events::CloseParentheses const& event)
 {
     lexems_.push_back(applyState(state));
 
     return States::EndOfParentheses{};
 }
 
-lexer::State lexer::FSM::onEvent(States::RTI const &state, Events::Letter const &event)
+lexer::State lexer::FSM::onEvent(States::RTI const& state, Events::Letter const& event)
 {
     return States::RTI{state.curr_str + event.symbol};
 }
 
-lexer::State lexer::FSM::onEvent(States::RTI const &state, Events::Colon const &event)
+lexer::State lexer::FSM::onEvent(States::RTI const& state, Events::Colon const& event)
 {
     lexems_.push_back(applyState(state));
 
     return States::Begin{};
 }
 
-lexer::State lexer::FSM::onEvent(States::RTI const &state, Events::OpenCurly const &event)
+lexer::State lexer::FSM::onEvent(States::RTI const& state, Events::OpenCurly const& event)
 {
     lexems_.push_back(applyState(state));
 
     return States::Begin{};
 }
 
-lexer::State lexer::FSM::onEvent(States::RTI const &state, Events::Punctuation const &event)
+lexer::State lexer::FSM::onEvent(States::RTI const& state, Events::Punctuation const& event)
 {
     lexems_.push_back(applyState(state));
 
     return States::Operation{std::string(1, event.symbol)};
 }
 
-lexer::State lexer::FSM::onEvent(States::RTI const &state, Events::Operation const &event)
+lexer::State lexer::FSM::onEvent(States::RTI const& state, Events::Operation const& event)
 {
     lexems_.push_back(applyState(state));
 
     return States::Operation{std::string(1, event.symbol)};
 }
 
-lexer::State lexer::FSM::onEvent(States::RTI const &state, Events::OpenParentheses const &event)
+lexer::State lexer::FSM::onEvent(States::RTI const& state, Events::OpenParentheses const& event)
 {
     lexems_.push_back(applyState(state));
 
     return States::Parentheses{};
 }
 
-lexer::State lexer::FSM::onEvent(States::RTI const &state, Events::Semicolon const &event)
+lexer::State lexer::FSM::onEvent(States::RTI const& state, Events::Semicolon const& event)
 {
     lexems_.push_back(applyState(state));
 
@@ -295,35 +304,35 @@ lexer::State lexer::FSM::onEvent(States::RTI const &state, Events::Semicolon con
 }
 
 
-lexer::State lexer::FSM::onEvent(States::Parentheses const &state, Events::Letter const &event)
+lexer::State lexer::FSM::onEvent(States::Parentheses const& state, Events::Letter const& event)
 {
     lexems_.push_back(applyState(state));
 
     return States::RTI{std::string(1, event.symbol)};
 }
 
-lexer::State lexer::FSM::onEvent(States::Parentheses const &state, Events::Space const &event)
+lexer::State lexer::FSM::onEvent(States::Parentheses const& state, Events::Space const& event)
 {
     lexems_.push_back(applyState(state));
 
     return States::Begin{};
 }
 
-lexer::State lexer::FSM::onEvent(States::Parentheses const &state, Events::OpenParentheses const &event)
+lexer::State lexer::FSM::onEvent(States::Parentheses const& state, Events::OpenParentheses const& event)
 {
     lexems_.push_back(applyState(state));
 
     return States::Parentheses{};
 }
 
-lexer::State lexer::FSM::onEvent(States::Parentheses const &state, Events::CloseParentheses const &event)
+lexer::State lexer::FSM::onEvent(States::Parentheses const& state, Events::CloseParentheses const& event)
 {
     lexems_.push_back(applyState(state));
 
     return States::EndOfParentheses{};
 }
 
-lexer::State lexer::FSM::onEvent(States::Parentheses const &state, Events::Semicolon const &event)
+lexer::State lexer::FSM::onEvent(States::Parentheses const& state, Events::Semicolon const& event)
 {
     lexems_.push_back(applyState(state));
 
@@ -331,21 +340,21 @@ lexer::State lexer::FSM::onEvent(States::Parentheses const &state, Events::Semic
 }
 
 
-lexer::State lexer::FSM::onEvent(States::EndOfParentheses const &state, Events::CloseParentheses const &event)
+lexer::State lexer::FSM::onEvent(States::EndOfParentheses const& state, Events::CloseParentheses const& event)
 {
     lexems_.push_back(applyState(state));
 
     return States::EndOfParentheses{};
 }
 
-lexer::State lexer::FSM::onEvent(States::EndOfParentheses const &state, Events::Semicolon const &event)
+lexer::State lexer::FSM::onEvent(States::EndOfParentheses const& state, Events::Semicolon const& event)
 {
     lexems_.push_back(applyState(state));
 
     return States::Begin{};
 }
 
-lexer::State lexer::FSM::onEvent(States::EndOfParentheses const &state, Events::Space const &event)
+lexer::State lexer::FSM::onEvent(States::EndOfParentheses const& state, Events::Space const& event)
 {
     lexems_.push_back(applyState(state));
 
@@ -353,58 +362,87 @@ lexer::State lexer::FSM::onEvent(States::EndOfParentheses const &state, Events::
 }
 
 
-lexer::State lexer::FSM::onEvent(States::Operation const &state, Events::Letter const &event)
+lexer::State lexer::FSM::onEvent(States::Operation const& state, Events::Letter const& event)
 {
-    lexems_.push_back(applyState(state));
+    for(Token& token : applyState(state))
+    {
+        lexems_.push_back(token);
+    }
 
     return States::RTI{std::string(1, event.symbol)};
 }
 
-lexer::State lexer::FSM::onEvent(States::Operation const &state, Events::Number const &event)
+lexer::State lexer::FSM::onEvent(States::Operation const& state, Events::Number const& event)
 {
-    lexems_.push_back(applyState(state));
+    for(Token& token : applyState(state))
+    {
+        lexems_.push_back(token);
+    }
 
     return States::Literal{std::string(1, event.symbol)};
 }
 
-lexer::State lexer::FSM::onEvent(States::Operation const &state, Events::Quote const &event)
+lexer::State lexer::FSM::onEvent(States::Operation const& state, Events::Quote const& event)
 {
-    lexems_.push_back(applyState(state));
+    for(Token& token : applyState(state))
+    {
+        lexems_.push_back(token);
+    }
 
     return States::String_literal{};
 }
 
-lexer::State lexer::FSM::onEvent(States::Operation const &state, Events::Semicolon const &event)
+lexer::State lexer::FSM::onEvent(States::Operation const& state, Events::Semicolon const& event)
 {
-    lexems_.push_back(applyState(state));
+    for(Token& token : applyState(state))
+    {
+        lexems_.push_back(token);
+    }
 
     return States::Begin{};
 }
 
-lexer::State lexer::FSM::onEvent(States::Operation const &state, Events::Space const &event)
+lexer::State lexer::FSM::onEvent(States::Operation const& state, Events::Space const& event)
 {
-    lexems_.push_back(applyState(state));
+    for(Token& token : applyState(state))
+    {
+        lexems_.push_back(token);
+    }
 
     return States::Operation{};
 }
 
-lexer::State lexer::FSM::onEvent(States::Operation const &state, Events::Operation const &event)
+lexer::State lexer::FSM::onEvent(States::Operation const& state, Events::Operation const& event)
 {
     return States::Operation{state.curr_str + event.symbol};
 }
 
 
-lexer::State lexer::FSM::onEvent(States::Literal const &state, Events::Number const &event)
+lexer::State lexer::FSM::onEvent(States::Literal const& state, Events::Number const& event)
 {
     return States::Literal{state.curr_str + event.symbol};
 }
 
-lexer::State lexer::FSM::onEvent(States::Literal const &state, Events::Dot const &event)
+lexer::State lexer::FSM::onEvent(States::Literal const& state, Events::Dot const& event)
 {
     return States::Literal{state.curr_str + event.symbol};
 }
 
-lexer::State lexer::FSM::onEvent(States::Literal const &state, Events::Semicolon const &event)
+lexer::State lexer::FSM::onEvent(States::Literal const& state, Events::Semicolon const& event)
+{
+    lexems_.push_back(applyState(state));
+
+    return States::Begin{};
+}
+
+lexer::State lexer::FSM::onEvent(States::Literal const& state, Events::Operation const& event)
+{
+    lexems_.push_back(applyState(state));
+
+    return States::Operation{std::string(1, event.symbol)};
+}
+
+lexer::State lexer::FSM::onEvent(States::Literal const& state, Events::Space const& event)
 {
     lexems_.push_back(applyState(state));
 
@@ -412,85 +450,85 @@ lexer::State lexer::FSM::onEvent(States::Literal const &state, Events::Semicolon
 }
 
 
-lexer::State lexer::FSM::onEvent(States::String_literal const &state, Events::Quote const &event)
+lexer::State lexer::FSM::onEvent(States::String_literal const& state, Events::Quote const& event)
 {
     lexems_.push_back(applyState(state));
 
     return States::EndOfStringLiteral{};
 }
 
-lexer::State lexer::FSM::onEvent(States::String_literal const &state, Events::Dot const &event)
+lexer::State lexer::FSM::onEvent(States::String_literal const& state, Events::Dot const& event)
 {
     return States::String_literal(state.curr_str + event.symbol);
 }
 
-lexer::State lexer::FSM::onEvent(States::String_literal const &state, Events::Space const &event)
+lexer::State lexer::FSM::onEvent(States::String_literal const& state, Events::Space const& event)
 {
     return States::String_literal(state.curr_str + event.symbol);
 }
 
-lexer::State lexer::FSM::onEvent(States::String_literal const &state, Events::Number const &event)
+lexer::State lexer::FSM::onEvent(States::String_literal const& state, Events::Number const& event)
 {
     return States::String_literal(state.curr_str + event.symbol);
 }
 
-lexer::State lexer::FSM::onEvent(States::String_literal const &state, Events::Underline const &event)
+lexer::State lexer::FSM::onEvent(States::String_literal const& state, Events::Underline const& event)
 {
     return States::String_literal(state.curr_str + event.symbol);
 }
 
-lexer::State lexer::FSM::onEvent(States::String_literal const &state, Events::Letter const &event)
+lexer::State lexer::FSM::onEvent(States::String_literal const& state, Events::Letter const& event)
 {
     return States::String_literal(state.curr_str + event.symbol);
 }
 
-lexer::State lexer::FSM::onEvent(States::String_literal const &state, Events::Colon const &event)
+lexer::State lexer::FSM::onEvent(States::String_literal const& state, Events::Colon const& event)
 {
     return States::String_literal(state.curr_str + event.symbol);
 }
 
-lexer::State lexer::FSM::onEvent(States::String_literal const &state, Events::OpenCurly const &event)
+lexer::State lexer::FSM::onEvent(States::String_literal const& state, Events::OpenCurly const& event)
 {
     return States::String_literal(state.curr_str + event.symbol);
 }
 
-lexer::State lexer::FSM::onEvent(States::String_literal const &state, Events::CloseCurly const &event)
+lexer::State lexer::FSM::onEvent(States::String_literal const& state, Events::CloseCurly const& event)
 {
     return States::String_literal(state.curr_str + event.symbol);
 }
 
-lexer::State lexer::FSM::onEvent(States::String_literal const &state, Events::Punctuation const &event)
+lexer::State lexer::FSM::onEvent(States::String_literal const& state, Events::Punctuation const& event)
 {
     return States::String_literal(state.curr_str + event.symbol);
 }
 
-lexer::State lexer::FSM::onEvent(States::String_literal const &state, Events::Operation const &event)
+lexer::State lexer::FSM::onEvent(States::String_literal const& state, Events::Operation const& event)
 {
     return States::String_literal(state.curr_str + event.symbol);
 }
 
-lexer::State lexer::FSM::onEvent(States::String_literal const &state, Events::OpenParentheses const &event)
+lexer::State lexer::FSM::onEvent(States::String_literal const& state, Events::OpenParentheses const& event)
 {
     return States::String_literal(state.curr_str + event.symbol);
 }
 
-lexer::State lexer::FSM::onEvent(States::String_literal const &state, Events::CloseParentheses const &event)
+lexer::State lexer::FSM::onEvent(States::String_literal const& state, Events::CloseParentheses const& event)
 {
     return States::String_literal(state.curr_str + event.symbol);
 }
 
-lexer::State lexer::FSM::onEvent(States::String_literal const &state, Events::Semicolon const &event)
+lexer::State lexer::FSM::onEvent(States::String_literal const& state, Events::Semicolon const& event)
 {
     return States::String_literal(state.curr_str + event.symbol);
 }
 
 
-lexer::State lexer::FSM::onEvent(States::EndOfStringLiteral const &state, Events::Punctuation const &event)
+lexer::State lexer::FSM::onEvent(States::EndOfStringLiteral const& state, Events::Punctuation const& event)
 {
     return States::Begin{};
 }
 
-lexer::State lexer::FSM::onEvent(States::EndOfStringLiteral const &state, Events::Semicolon const &event)
+lexer::State lexer::FSM::onEvent(States::EndOfStringLiteral const& state, Events::Semicolon const& event)
 {
     return States::Begin{};
 }
