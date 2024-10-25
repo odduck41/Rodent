@@ -1,0 +1,10 @@
+func gcd(int a, int b) -> int {
+    while (a && b) {
+        if (a < b) {
+            b %= a;
+        } else {
+            a %= b;
+        }
+    }
+    return a + b;
+}

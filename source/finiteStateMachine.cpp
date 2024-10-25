@@ -55,7 +55,7 @@ Token lexer::FSM::applyState(const States::String_literal& state) const
 
 Token lexer::FSM::applyState(const States::RTI& state) const
 {
-    if (inTrie(state.curr_str.c_str()))
+    if (inTrie(state.curr_str.c_str(), reserved_))
     {
         return {
             Lexeme::s_literal,
