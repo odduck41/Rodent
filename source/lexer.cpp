@@ -59,7 +59,7 @@ void add(Trie*& level, char cur) {
     level = level->children[cur - 'a'];
 }
 
-const char* removeComments(const char* line) {
+std::string removeComments(const char* line, long long& sz) {
     std::string str(line);
     std::string result;
     bool inLineComment = false;
@@ -79,8 +79,9 @@ const char* removeComments(const char* line) {
             }
         }
     }
+    sz = result.size();
 
-    return result.c_str();
+    return result;
 }
 
 
@@ -101,7 +102,7 @@ bool inTrie(const char* word, const Trie* level, size_t current) {
 
 std::string tokenize(const char* from) {
     std::ifstream is(from, std::ifstream::ate | std::ifstream::binary);
-    const long long sz = is.tellg();
+    long long sz = is.tellg();
 
     char* lines = new char[sz + 1];
 
@@ -113,7 +114,7 @@ std::string tokenize(const char* from) {
     std::cout << lines << '\n';
     std::cout << "========================" << '\n';
 
-    const char *lines_new = removeComments(lines);
+    const char *lines_new = removeComments(lines, sz).c_str();
 
     std::cout << lines_new << '\n';
     std::cout << "========================" << '\n';
