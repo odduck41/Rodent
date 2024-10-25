@@ -115,13 +115,7 @@ std::string tokenize(const char* from) {
 
     lines[sz] = '\0';
 
-    std::cout << lines << '\n';
-    std::cout << "========================" << '\n';
-
     std::string lines_new = removeComments(lines);
-
-    std::cout << lines_new << '\n';
-    std::cout << "========================" << '\n';
 
     lexer::FSM state_machine(lines_new.c_str(), lines_new.size());
 

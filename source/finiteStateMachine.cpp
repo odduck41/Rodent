@@ -16,9 +16,14 @@ void lexer::FSM::processText()
 
     while (curr_symbol < text_ + text_length_)
     {
-        if (*curr_symbol == '\n' || *curr_symbol == '\r')
+        if (*curr_symbol == '\n')
         {
             ++line_;
+            ++curr_symbol;
+            continue;
+        }
+        if (*curr_symbol == '\r')
+        {
             ++curr_symbol;
             continue;
         }
@@ -173,6 +178,12 @@ lexer::State lexer::FSM::onEvent(States::Begin const& state, Events::Space const
 
 lexer::State lexer::FSM::onEvent(States::Begin const& state, Events::Semicolon const& event)
 {
+    lexems_.push_back(Token{
+        punctuation,
+        ";",
+        line_
+    });
+
     return States::Begin{};
 }
 
@@ -294,6 +305,12 @@ lexer::State lexer::FSM::onEvent(States::RTI const& state, Events::Semicolon con
 {
     lexems_.push_back(applyState(state));
 
+    lexems_.push_back(Token{
+        punctuation,
+        ";",
+        line_
+    });
+
     return States::Begin{};
 }
 
@@ -330,6 +347,12 @@ lexer::State lexer::FSM::onEvent(States::Parentheses const& state, Events::Semic
 {
     lexems_.push_back(applyState(state));
 
+    lexems_.push_back(Token{
+        punctuation,
+        ";",
+        line_
+    });
+
     return States::Begin{};
 }
 
@@ -344,6 +367,12 @@ lexer::State lexer::FSM::onEvent(States::EndOfParentheses const& state, Events::
 lexer::State lexer::FSM::onEvent(States::EndOfParentheses const& state, Events::Semicolon const& event)
 {
     lexems_.push_back(applyState(state));
+
+    lexems_.push_back(Token{
+        punctuation,
+        ";",
+        line_
+    });
 
     return States::Begin{};
 }
@@ -393,6 +422,12 @@ lexer::State lexer::FSM::onEvent(States::Operation const& state, Events::Semicol
         lexems_.push_back(token);
     }
 
+    lexems_.push_back(Token{
+        punctuation,
+        ";",
+        line_
+    });
+
     return States::Begin{};
 }
 
@@ -425,6 +460,12 @@ lexer::State lexer::FSM::onEvent(States::Literal const& state, Events::Dot const
 lexer::State lexer::FSM::onEvent(States::Literal const& state, Events::Semicolon const& event)
 {
     lexems_.push_back(applyState(state));
+
+    lexems_.push_back(Token{
+        punctuation,
+        ";",
+        line_
+    });
 
     return States::Begin{};
 }
@@ -513,6 +554,12 @@ lexer::State lexer::FSM::onEvent(States::String_literal const& state, Events::Cl
 
 lexer::State lexer::FSM::onEvent(States::String_literal const& state, Events::Semicolon const& event)
 {
+    lexems_.push_back(Token{
+        punctuation,
+        ";",
+        line_
+    });
+
     return States::String_literal(state.curr_str + event.symbol);
 }
 
@@ -524,6 +571,12 @@ lexer::State lexer::FSM::onEvent(States::EndOfStringLiteral const& state, Events
 
 lexer::State lexer::FSM::onEvent(States::EndOfStringLiteral const& state, Events::Semicolon const& event)
 {
+    lexems_.push_back(Token{
+        punctuation,
+        ";",
+        line_
+    });
+
     return States::Begin{};
 }
 
@@ -552,7 +605,7 @@ std::vector<Token> lexer::operations(const std::string& a, size_t line) {
         }
         else if (a[index] == '-') {
             if (index + 1 < a.size() &&
-                (a[index + 1] == '-' || a[index + 1] == '=')) {
+                (a[index + 1] == '-' || a[index + 1] == '=' || a[index + 1] == '>')) {
                     ret.push_back(Token{
                         operation,
                         a.substr(index, 2),
