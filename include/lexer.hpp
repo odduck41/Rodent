@@ -33,7 +33,7 @@ extern Trie* types_;
 void load_reserved();
 void load_basic_types();
 
-void removeComments(const char* &line);
+const char* removeComments(const char* line);
 
 void add(Trie*&, char);
 void addAll(const char*, Trie*);
