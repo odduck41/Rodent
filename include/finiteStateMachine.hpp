@@ -302,5 +302,6 @@ namespace lexer
 
         // Process
         State processEvent(State const& state, Event const& event);
+        size_t line_ = 1;
     };
 }

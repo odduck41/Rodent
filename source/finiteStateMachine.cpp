@@ -5,6 +5,8 @@ lexer::FSM::FSM(const char* text, size_t text_length)
       text_length_(text_length)
 {
     processText();
+    load_reserved();
+    load_basic_types();
 }
 
 void lexer::FSM::processText()
@@ -14,6 +16,11 @@ void lexer::FSM::processText()
 
     while (curr_symbol < text_ + text_length_)
     {
+        if (*curr_symbol == '\n' || *curr_symbol == '\r') {
+            ++line_;
+            ++curr_symbol;
+            continue;
+        }
         Event event = getEvent(*curr_symbol);
         curr_state = processEvent(curr_state, event);
         ++curr_symbol;
@@ -31,7 +38,7 @@ Token lexer::FSM::applyState(const States::Operation& state) const
     return {
         Lexeme::operation,
         state.curr_str,
-        0
+        line_
     };
 }
 
@@ -40,7 +47,7 @@ Token lexer::FSM::applyState(const States::Literal& state) const
     return {
         Lexeme::literal,
         state.curr_str,
-        0
+        line_
     };
 }
 
@@ -49,26 +56,26 @@ Token lexer::FSM::applyState(const States::String_literal& state) const
     return {
         Lexeme::s_literal,
         state.curr_str,
-        0
+        line_
     };
 }
 
 Token lexer::FSM::applyState(const States::RTI& state) const
 {
-    if (rand() % 2)
+    if (inTrie(state.curr_str.c_str(), reserved_))
     {
         return {
-            Lexeme::s_literal,
+            Lexeme::reserved,
             state.curr_str,
-            0
+            line_
         };
     }
-    else if (rand() % 2) /* проверка на тип */
+    else if (inTrie(state.curr_str.c_str(), types_)) /* проверка на тип */
     {
         return {
             Lexeme::type,
             state.curr_str,
-            0
+            line_
         };
     }
     else
@@ -76,7 +83,7 @@ Token lexer::FSM::applyState(const States::RTI& state) const
         return {
             Lexeme::identifier,
             state.curr_str,
-            0
+            line_
         };
     }
 }
@@ -86,7 +93,7 @@ Token lexer::FSM::applyState(const States::Parentheses& state) const
     return {
         Lexeme::parentheses,
         "(",
-        0
+        line_
     };
 }
 
@@ -95,7 +102,7 @@ Token lexer::FSM::applyState(const States::EndOfParentheses& state) const
     return {
         Lexeme::parentheses,
         ")",
-        0
+        line_
     };
 }
 
@@ -378,7 +385,7 @@ lexer::State lexer::FSM::onEvent(States::Operation const &state, Events::Space c
 {
     lexems_.push_back(applyState(state));
 
-    return States::Begin{};
+    return States::Operation{};
 }
 
 lexer::State lexer::FSM::onEvent(States::Operation const &state, Events::Operation const &event)

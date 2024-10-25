@@ -92,8 +92,30 @@ std::string tokenize(const char* from) {
     std::string ret;
 
     for (auto& token : lexemes) {
-        ret += "<Type: " + std::to_string(token.type) +
-                ", Content: " + std::string(token.content) +
+        ret += "<Type: ";
+        if (token.type == reserved) {
+            ret += "reserved";
+        } else if (token.type == identifier) {
+            ret += "identifier";
+        } else if (token.type == literal) {
+            ret += "literal";
+        } else if (token.type == type) {
+            ret += "type";
+        } else if (token.type == s_literal) {
+            ret += "SLiteral";
+        } else if (token.type == operation) {
+            ret += "operation";
+        } else if (token.type == punctuation) {
+            ret += "punctuation";
+        } else if (token.type == dot) {
+            ret += "dot";
+        } else if (token.type == comma) {
+            ret += "comma";
+        } else {
+            ret += "parentheses";
+        }
+
+        ret += ", Content: \"" + std::string(token.content) + "\"" +
                 ", Line: " + std::to_string(token.line) + ">\n";
     }
 

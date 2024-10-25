@@ -1,4 +1,5 @@
 func gcd(int a, int b) -> int {
+    str s = "Hello, world!";
     while (a && b) {
         if (a < b) {
             b %= a;
