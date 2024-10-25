@@ -59,14 +59,14 @@ void add(Trie*& level, char cur) {
     level = level->children[cur - 'a'];
 }
 
-const char* removeComments(const char* line) {
+std::string removeComments(const char* line) {
     std::string str(line);
     std::string result;
     bool inLineComment = false;
 
     for (size_t i = 0; i < str.length(); ++i) {
         if (inLineComment) {
-            if (str[i] == '\n') {
+            if (str[i] == '\r') {
                 inLineComment = false;
                 result += str[i];
             }
@@ -74,13 +74,18 @@ const char* removeComments(const char* line) {
             if (str[i] == '/' && i + 1 < str.length() && str[i + 1] == '/') {
                 inLineComment = true;
                 ++i;
+                result += " ";
             } else {
                 result += str[i];
             }
         }
     }
 
-    return result.c_str();
+    // std::cout << "%%%%%%%%%%%%" << '\n';
+    // std::cout << result.c_str() << '\n';
+    // std::cout << "%%%%%%%%%%%%" << '\n';
+
+    return result;
 }
 
 
@@ -101,7 +106,7 @@ bool inTrie(const char* word, const Trie* level, size_t current) {
 
 std::string tokenize(const char* from) {
     std::ifstream is(from, std::ifstream::ate | std::ifstream::binary);
-    const long long sz = is.tellg();
+    long long sz = is.tellg();
 
     char* lines = new char[sz + 1];
 
@@ -113,12 +118,12 @@ std::string tokenize(const char* from) {
     std::cout << lines << '\n';
     std::cout << "========================" << '\n';
 
-    const char *lines_new = removeComments(lines);
+    std::string lines_new = removeComments(lines);
 
     std::cout << lines_new << '\n';
     std::cout << "========================" << '\n';
 
-    lexer::FSM state_machine(lines_new, sz);
+    lexer::FSM state_machine(lines_new.c_str(), lines_new.size());
 
     auto lexemes = state_machine.getLexems();
 
@@ -153,7 +158,7 @@ std::string tokenize(const char* from) {
     }
 
     delete[] lines;
-    delete[] lines_new;
+    // delete[] lines_new;
 
     return ret;
 }
