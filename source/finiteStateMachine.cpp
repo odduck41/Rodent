@@ -526,3 +526,100 @@ lexer::State lexer::FSM::onEvent(States::EndOfStringLiteral const& state, Events
 {
     return States::Begin{};
 }
+
+
+std::vector<Token> operations(const std::string& a, size_t line) {
+    std::vector<Token> ret;
+    size_t index = 0;
+    while (index < a.size()) {
+        if (a[index] == '+') {
+            if (index + 1 < a.size() &&
+                (a[index + 1] == '+' || a[index + 1] == '=')) {
+                ret.push_back(Token{
+                    operation,
+                    a.substr(index, 2),
+                    line
+                });
+            } else {
+                ret.push_back(Token{
+                     operation,
+                     std::string(1, a[index]),
+                     line
+                 });
+            }
+        }
+        else if (a[index] == '-') {
+            if (index + 1 < a.size() &&
+                (a[index + 1] == '-' || a[index + 1] == '=')) {
+                    ret.push_back(Token{
+                        operation,
+                        a.substr(index, 2),
+                        line
+                    });
+                } else {
+                    ret.push_back(Token{
+                         operation,
+                         std::string(1, a[index]),
+                         line
+                     });
+                }
+        }
+        else if (a[index] == '*' || a[index] == '/'
+            || a[index] == '=' || a[index] == '!') {
+            if (index + 1 < a.size() && a[index + 1] == '=') {
+                ret.push_back(Token{
+                        operation,
+                        a.substr(index, 2),
+                        line
+                    });
+            } else {
+                ret.push_back(Token{
+                         operation,
+                         std::string(1, a[index]),
+                         line
+                });
+            }
+        }
+        else if (a[index] == '&' || a[index] == '|') {
+            if (index + 1 < a.size() &&
+                (a[index + 1] == a[index] || a[index + 1] == '=')) {
+                ret.push_back(Token{
+                        operation,
+                        a.substr(index, 2),
+                        line
+                });
+            } else {
+                ret.push_back(Token{
+                         operation,
+                         std::string(1, a[index]),
+                         line
+                });
+            }
+        } else if (a[index] == '<' || a[index] == '>') {
+            if (index + 1 < a.size() && a[index + 1] == '='
+                || a[index + 1] == a[index]) {
+                if (index + 2 < a.size() && a[index + 1] == a[index]
+                    && a[index + 2] == '=') {
+                    ret.push_back(Token{
+                        operation,
+                        a.substr(index, 3),
+                        line
+                });
+                } else {
+                    ret.push_back(Token{
+                        operation,
+                        a.substr(index, 2),
+                        line
+                });
+                }
+            } else {
+                ret.push_back(Token{
+                         operation,
+                         std::string(1, a[index]),
+                         line
+                });
+            }
+        }
+    }
+    return ret;
+}
