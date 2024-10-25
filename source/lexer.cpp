@@ -59,6 +59,31 @@ void add(Trie*& level, char cur) {
     level = level->children[cur - 'a'];
 }
 
+const char* removeComments(const char* line) {
+    std::string str(line);
+    std::string result;
+    bool inLineComment = false;
+
+    for (size_t i = 0; i < str.length(); ++i) {
+        if (inLineComment) {
+            if (str[i] == '\n') {
+                inLineComment = false;
+                result += str[i];
+            }
+        } else {
+            if (str[i] == '/' && i + 1 < str.length() && str[i + 1] == '/') {
+                inLineComment = true;
+                ++i;
+            } else {
+                result += str[i];
+            }
+        }
+    }
+
+    return result.c_str();
+}
+
+
 bool inTrie(const char* word, const Trie* level, size_t current) {
     if (level->terminal && word[current] != '\0') {
         return false;
@@ -85,7 +110,15 @@ std::string tokenize(const char* from) {
 
     lines[sz] = '\0';
 
-    lexer::FSM state_machine(lines, sz);
+    std::cout << lines << '\n';
+    std::cout << "========================" << '\n';
+
+    const char *lines_new = removeComments(lines);
+
+    std::cout << lines_new << '\n';
+    std::cout << "========================" << '\n';
+
+    lexer::FSM state_machine(lines_new, sz);
 
     auto lexemes = state_machine.getLexems();
 
@@ -120,6 +153,7 @@ std::string tokenize(const char* from) {
     }
 
     delete[] lines;
+    delete[] lines_new;
 
     return ret;
 }

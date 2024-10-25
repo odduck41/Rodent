@@ -5,8 +5,11 @@ func gcd(int a, int b) -> int {
             b %= a;
         } else {
             a %= b;
-        }
+        } // askfj;asldfkjasldf
     }
+    // m ipoiupouhyuo
     return a + b;
-    forif fi if for 45.56.57 a+=b++=9+++++9;
+    forif fi if for 45.56.57 a+=b++=9++++ + 9;
+    a += daf % sd sd52sd; //asdfasdfl;jhasdfklasdf
+    a%b;
 }
