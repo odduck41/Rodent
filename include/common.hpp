@@ -1,35 +1,37 @@
 #pragma once
 
 #include <map>
-#include <iostream>
 
 #include "exceptions.hpp"
 #include "files.hpp"
 #include "lexer.hpp"
+#include "test.h"
 
 template<class ...T>
 std::map<char, void(*)(T ...)> function;
 
-std::string filename;
-std::string out;
+inline std::string filename;
+inline std::string out;
 
 
-void lex(const char* output = "a.dev") {
+inline void lex(const char* output = "a.dev") {
     out = output;
 }
 
-static inline void defineFlags() {
+static void defineFlags() {
     function<const char*>['l'] = &lex;
 }
 
-static inline void doAll() {
+static void doAll() {
+    loadReserved();
+    loadTypes();
 
-    freopen("hello.txt", "w", stdout);
+    // test();
 
     RFile file(filename.c_str());
     const long long size_ = file.size();
 
-    char* program = new char[size_ + 1];
+    auto program = new char[size_ + 1];
 
     file.read(program, size_);
 
