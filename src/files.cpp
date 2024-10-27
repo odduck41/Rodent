@@ -1,6 +1,6 @@
 #include "files.hpp"
 
-RFile::RFile(const char* filename) : std::ifstream(filename, std::ifstream::binary) {}
+RFile::RFile(const char* filename) : std::wifstream(filename, std::ifstream::binary) {}
 
 long long RFile::size() {
     if (!this->is_open()) return 0;

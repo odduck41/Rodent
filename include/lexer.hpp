@@ -9,14 +9,14 @@ struct Trie {
 extern Trie* reserved;
 extern Trie* types;
 
-void removeComments(size_t, char*&);
+void removeComments(size_t, wchar_t*&);
 
 void loadReserved(const char* = "../reserved.txt");
 void loadTypes(const char* = "../types.txt");
 
-void addAll(const char*, Trie*);
-void add(char, Trie*&);
+void addAll(const wchar_t*, Trie*);
+void add(wchar_t, Trie*&);
 
-bool inTrie(const char*, const Trie*, size_t = 0);
-bool inTrie(const std::string&, const Trie*, size_t = 0);
+bool inTrie(const wchar_t*, const Trie*, size_t = 0);
+bool inTrie(const std::wstring&, const Trie*, size_t = 0);
 

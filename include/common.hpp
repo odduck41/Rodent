@@ -8,7 +8,7 @@
 // #include "test.h"
 
 template<class ...T>
-std::map<char, void(*)(T ...)> function;
+std::map<wchar_t, void(*)(T ...)> function;
 
 inline std::string filename;
 inline std::string out;
@@ -31,7 +31,7 @@ static void doAll() {
     RFile file(filename.c_str());
     const long long size_ = file.size();
 
-    auto program = new char[size_ + 1];
+    auto program = new wchar_t[size_ + 1];
 
     file.read(program, size_);
 
@@ -48,9 +48,9 @@ inline void doFlags(int argc, const char** argv) {
     defineFlags();
     for (size_t i = 1; i < argc; ++i) {
         if (argv[i][0] == '-') {
-            if (function<>.contains(argv[i][1]) || function<const char*>.contains(argv[i][1])) {
+            if (function<>.contains(argv[i][1]) || function<const wchar_t*>.contains(argv[i][1])) {
                 if (i + 1 != argc && argv[i + 1][0] != '-') {
-                    function<const char*>[argv[i][1]](argv[i + 1]);
+                    function<const wchar_t*>[argv[i][1]](reinterpret_cast<const wchar_t*>(argv[i + 1]));
                 } else {
                     function<>[argv[i][1]]();
                 }
@@ -58,9 +58,8 @@ inline void doFlags(int argc, const char** argv) {
                 goto next;
             }
             throw BadFlag(argv[i]);
-        } else {
-             filename = argv[i];
         }
+        filename = argv[i];
 
         next:;
     }

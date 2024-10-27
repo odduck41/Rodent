@@ -7,8 +7,8 @@
 Trie* reserved = new Trie;
 Trie* types = new Trie;
 
-void removeComments(const size_t sz, char*& program) {
-    std::string result;
+void removeComments(const size_t sz, wchar_t*& program) {
+    std::wstring result;
     result.reserve(sz + 1);
 
     bool single{}, multiline{};
@@ -58,7 +58,7 @@ void removeComments(const size_t sz, char*& program) {
 }
 
 void process(RFile& file, const long long size_, Trie* trie) {
-    const auto str = new char[size_ + 1];
+    const auto str = new wchar_t[size_ + 1];
     file.read(str, size_);
     str[size_] = '\0';
 
@@ -79,7 +79,7 @@ void loadTypes(const char* filename) {
     process(file, file.size(), types);
 }
 
-void addAll(const char* str, Trie* trie) {
+void addAll(const wchar_t* str, Trie* trie) {
     Trie* current = trie;
     for (size_t i = 0; str[i] != '\0'; ++i) {
         if (str[i] == '\n' || str[i] == '\r' || str[i] == ' ') {
@@ -92,14 +92,14 @@ void addAll(const char* str, Trie* trie) {
     current->terminal = true;
 }
 
-void add(const char s, Trie*& level) {
+void add(const wchar_t s, Trie*& level) {
     if (level->children[s - 'a'] == nullptr) {
         level->children[s - 'a'] = new Trie;
     }
     level = level->children[s - 'a'];
 }
 
-bool inTrie(const char* s, const Trie* trie, const size_t sz) {
+bool inTrie(const wchar_t* s, const Trie* trie, const size_t sz) {
     if (s[sz] == '\0' && trie->terminal) {
         return true;
     }
@@ -111,7 +111,7 @@ bool inTrie(const char* s, const Trie* trie, const size_t sz) {
     return inTrie(s, trie->children[s[sz] - 'a'], sz + 1);
 }
 
-bool inTrie(const std::string& s, const Trie* trie, size_t sz) {
+bool inTrie(const std::wstring& s, const Trie* trie, size_t sz) {
     if (sz == s.size() && trie->terminal) {
         return true;
     }
