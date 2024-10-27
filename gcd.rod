@@ -1,0 +1,23 @@
+
+func gcd(int a, int b) -> int { // gcd func
+/*
+    this function returns gcd of a and b
+*/
+    while (a && b) { // circle
+        if (a > b) {
+            a %= b;
+        } else {
+            b %= a;
+        }
+    } // end
+
+/*
+    now one of the values a or b is equal to gcd, and other is zero
+*/
+    return a + b; // so we can return a + b
+
+}
+
+func main() -> int {
+    return gcd(543, 4532);
+}
