@@ -5,7 +5,7 @@
 #include "exceptions.hpp"
 #include "files.hpp"
 #include "lexer.hpp"
-#include "test.h"
+// #include "test.h"
 
 template<class ...T>
 std::map<char, void(*)(T ...)> function;
