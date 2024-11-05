@@ -1,0 +1,124 @@
+
+# Axioms
+
+\<letter> - любая буква любого языка(wchar_t)
+\<digit> - цифра: \[0, 9]
+\<symbol> - вообще всё что угодно
+
+# Basic things
+
+\<name> ::= \<letter>{\[\<letter> | \<digit>]}
+\<identifier> ::= \<name>
+
+## Types etc.
+
+\<basic_type> ::= int | double | char | bool | str | array 
+\<user_type> ::=  \<name>// На случай, если мы будем добавлять ООП
+\<type> ::= \<basic_type> | \<user_type>
+## Literals
+\<int$_{10}$> ::= {\<digit>}
+\<int$_{2}$> ::= 0b{0 | 1}
+\<int$_{16}$> ::= 0x{0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | A | B | C | D | E | F}
+
+\<uil> ::= \<int$_{10}$> | \<int$_{2}$> | \<int$_{16}$>
+\<sign> ::= + | -
+\<sil> ::= \<sign> \<uil>
+
+\<int> ::= \<uil> | \<sil>
+
+\<str> ::= "{\<symbol>}"
+
+\<literal> ::= \<int> | \<str>
+
+# Expressions
+
+## Operators
+
+\<op0> ::= `,`
+\<op1> ::= `=` | `+=` | `-=` | `*=` | `/=` | `%=` | `&=` | `|=` | `^=` | `<<=` | `>>=`
+\<op2> ::= `||` | `or`
+\<op3> ::= `&&` | `and`
+\<op4> ::= `|`
+\<op5> ::= `&`
+\<op6> ::= `==` | `!=`
+\<op7> ::= `>` | `<` | `<=` | `>=` | `<=>`
+\<op8> ::= `<<` | `>>`
+\<op9> ::= `+` | `-`
+\<op10> ::= `*` | `/` | `%`
+\<op11> ::= `!` | `++int` | `--int` | `+int` | `-int`
+\<op12> ::= `int++` | `int--`
+\<op13, type, args> ::= `[`args`]` | `(`args`)` | `.`args 
+\<op14> ::= `@` // 0-ary =)
+
+## Expressions
+
+\<expr0> ::= \<expr1>{\<op0> \<expr1>}
+\<expr1> ::= \<expr2>{\<op1> \<expr2>}
+\<expr2> ::= \<expr3>{\<op2> \<expr3>}
+\<expr3> ::= \<expr4>{\<op3> \<expr4>}
+\<expr4> ::= \<expr5>{\<op4> \<expr5>}
+\<expr5> ::= \<expr6>{\<op5> \<expr6>}
+\<expr6> ::= \<expr7>{\<op6> \<expr7>}
+\<expr7> ::= \<expr8>{\<op7> \<expr8>}
+\<expr8> ::= \<expr9>{\<op8> \<expr9>}
+\<expr9> ::= \<expr10>{\<op9> \<expr10>}
+\<expr10> ::= \<expr11>{\<op10> \<expr11>}
+\<expr11> ::= \<expr12>{\<op11> \<expr12>}
+\<expr12> ::= \<expr13>{\<op12> \<expr13>}
+\<expr13> ::= \<expression>\[\<op13, `[]`,  \<expression>> | \<op13, `()`, {\<expression>}> | \<op13, `.`, \<identifier>> ]
+
+\<expression> ::= (\<expr0>) | \<identifier> | \<literal> | `;` | \<function call>
+
+# Variables
+
+\<declaration> ::= extern \<type> \<name> {, \<name>}; // не факт что будет
+\<def> ::= \<name> = \<literal> | \<name>
+
+\<definition> ::= \<type> \<def> {, \<def>};
+
+# Operands
+
+\<if> ::= if (\<expression>) `{`{\<statement>}`}` { else \<if> | elif (\<expression>) `{`{\<statement>}`}` } \[else `{`{\<statement>}`}`]
+
+\<while> ::= while (\<expression>) `{`{\<loop-statement>}`}`
+
+\<for> ::= for (\[\<expression>]; \[\<expression>]; \[\<expression>]) `{`{\<loop-statement>}`}`
+
+\<do-while> ::= do `{`{\<loop-statement>}`}` while (\<expression>)
+
+\<switch> ::= switch(\<identifier>) `{`{case \<expression> : {\<statement>}} \[default : {\<statement>}]`}`
+
+\<statement> ::= \<if> | \<while> | \<for> | \<do-while> | \<switch> | \<return>
+
+\<loop-statement> ::= \<statement> | `break;` | `continue;`
+
+# Functions
+
+\<return> ::= return \<expression>;
+
+\<arguments> ::= \[\<type> \<identifier> {, \<type> \<identifier>} \[, {\<type> \<identifier> = \<literal>}]]
+
+\<function declaration> ::= func \<identifier> (\<arguments>) -> \<type>;
+
+\<body> ::= {\<statement>}
+\<function definition> ::= func \<identifier> (\<arguments>) -> \<type> `{`\<body>`}`
+
+\<given> ::= {\<expression>}
+
+\<function call> ::= \<identifier>`(`\<given>`)`
+
+
+## Program
+
+\<file> ::= {\<symbol>}.rod
+\<import> ::= import "\<file>"
+
+
+\<program things> ::= \<import> | \<function declaration> | \<function definition> | \<declaration> | \<definition>
+\<enter> ::= func main() -> int `{`\<body>`}`
+
+
+**\<program> ::= {\<program things>}\[enter]{\<program things>} \<EOF>**
+
+
+
