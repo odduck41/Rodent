@@ -67,7 +67,7 @@
 + \<expr12> ::= \<expr13>{\<op12> \<expr13>}
 + \<expr13> ::= \<expression>\[\<op13, `[]`,  \<expression>> | \<op13, `()`, {\<expression>}> | \<op13, `.`, \<identifier>> ]
 
-+ \<expression> ::= \<expr0> | \<expr1> | \<expr2> | \<expr3> | \<expr4> | \<expr5> | \<expr6> | \<expr7> | \<expr8> | \<expr9> | \<expr10> | \<expr11> | \<expr12> | \<expr13> | \<identifier> | \<literal> | \<function_call>
++ \<expression> ::= \<expr0> | \<expr1> | \<expr2> | \<expr3> | \<expr4> | \<expr5> | \<expr6> | \<expr7> | \<expr8> | \<expr9> | \<expr10> | \<expr11> | \<expr12> | \<expr13> | \<identifier> | \<literal> | \<function_call> | ';'
 
 # Variables
 
