@@ -63,8 +63,8 @@
 + \<expr8> ::= \<expr9>{\<op8> \<expr9>}
 + \<expr9> ::= \<expr10>{\<op9> \<expr10>}
 + \<expr10> ::= \<expr11>{\<op10> \<expr11>}
-+ \<expr11> ::= \<expr12>{\<op11> \<expr12>}
-+ \<expr12> ::= \<expr13>{\<op12> \<expr13>}
++ \<expr11> ::= \[\<op11>]\<expr12>
++ \<expr12> ::= \<expr13>\[\<op12>]
 + \<expr13> ::= \<atom>\[\<op13, `[]`,  \<atom>> | \<op13, `()`, {\<atom>}> | \<op13, `.`, \<identifier>> ]
 + \<atom> ::= \<identifier> | \<literal> | (\<expr0>)
 
