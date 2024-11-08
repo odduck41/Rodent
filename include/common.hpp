@@ -57,7 +57,7 @@ inline void doFlags(int argc, const char** argv) {
 
                 goto next;
             }
-            throw BadFlag(argv[i]);
+            throw bad_flag(argv[i]);
         }
         filename = argv[i];
 
