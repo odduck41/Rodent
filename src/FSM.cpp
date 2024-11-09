@@ -3,6 +3,7 @@
 #include "exceptions.hpp"
 
 #include <codecvt>
+#include <cstdint>
 #include <cstdio>
 #include <cwctype>
 #include <locale>
@@ -11,7 +12,7 @@
 namespace lexer {
 FiniteStateMachine::FiniteStateMachine(const char* programm_text,
                                        size_t programm_lenght)
-    : reserwed_words_("../assets/reserved.txt"),
+    : reserved_words_("../assets/reserved.txt"),
       type_words_("../assets/types.txt") {}
 
 void FiniteStateMachine::operations(const std::wstring& str) {}
@@ -21,7 +22,7 @@ void FiniteStateMachine::applyState(states::SpecialSymbols state) {
 }
 
 void FiniteStateMachine::applyState(states::RTI state) {
-  if (reserwed_words_.check(state.curr_str)) {
+  if (reserved_words_.check(state.curr_str)) {
     tokens_.push_back({Lexeme::Reserved, state.curr_str, curr_line_});
   } else if (type_words_.check(state.curr_str)) {
     tokens_.push_back({Lexeme::Type, state.curr_str, curr_line_});

@@ -23,8 +23,8 @@ static void defineFlags() {
 }
 
 static void doAll() {
-    loadReserved();
-    loadTypes();
+    // loadReserved();
+    // loadTypes();
 
     // test();
 
@@ -37,7 +37,7 @@ static void doAll() {
 
     program[size_] = '\0';
 
-    removeComments(size_ + 1, program);
+    // removeComments(size_ + 1, program);
 
 
 

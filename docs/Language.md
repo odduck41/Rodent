@@ -48,7 +48,6 @@
 + \<op10> ::= `*` | `/` | `%`
 + \<op11> ::= `!` | `++int` | `--int` | `+int` | `-int`
 + \<op12> ::= `int++` | `int--`
-+ \<op13, type, args> ::= `[`args`]` | `(`args`)` | `.`args 
 
 ## Expressions
 
@@ -65,10 +64,11 @@
 + \<expr10> ::= \<expr11>{\<op10> \<expr11>}
 + \<expr11> ::= \[\<op11>]\<expr12>
 + \<expr12> ::= \<expr13>\[\<op12>]
-+ \<expr13> ::= \<atom>\[\<op13, `[]`,  \<atom>> | \<op13, `()`, {\<atom>}> | \<op13, `.`, \<identifier>> ]
++ \<expr13> ::= \<atom>`[`\<expression>`]` | \<atom>`.`\<identifier>
 + \<atom> ::= \<identifier> | \<literal> | \<function_call> | (\<expr0>)
 
-+ \<expression> ::= [\<expr0>]';' | \<atom> [';']
++ \<expr> ::= \<expr0> | \<atom>
++ \<expression> ::= \<expr>`;` | `;`
 
 # Variables
 
@@ -87,24 +87,22 @@
 
 + \<do-while> ::= do `{`{\<loop-statement>}`}` while (\<expression>)
 
-+ \<switch> ::= switch(\<identifier>) `{`{case \<expression> : {\<statement>}} \[default : {\<statement>}]`}`
++ \<switch> ::= switch(\<identifier>) `{`{case \<literal> : {\<statement>}} \[default : {\<statement>}]`}`
 
-+ \<statement> ::= \<if> | \<while> | \<for> | \<do-while> | \<switch> | \<return> | \<expression>
-
-+ \<loop-statement> ::= \<statement> | `break;` | `continue;`
++ \<statement> ::= \<if> | \<while> | \<for> | \<do-while> | \<switch> | \<return> | \<expression> | `break` | `continue`
 
 # Functions
 
 + \<return> ::= return \<expression>;
 
-+ \<arguments> ::= \[\<type> \<identifier> {, \<type> \<identifier>} \[, {\<type> \<identifier> = \<literal>}]]
++ \<arguments> ::= \[\<type> \<identifier> {, \<type> \<identifier>} \{, \<type> \<identifier> = \<literal>}]
 
 + \<function_declaration> ::= func \<identifier> (\<arguments>) -> \<type>;
 
 + \<body> ::= {\<statement>}
 + \<function_definition> ::= func \<identifier> (\<arguments>) -> \<type> `{`\<body>`}`
 
-+ \<given> ::= {\<expression>}
++ \<given> ::= \[\<expression>{, \<expression>}]
 
 + \<function_call> ::= \<identifier>`(`\<given>`)`
 
@@ -112,7 +110,7 @@
 ## Program
 
 + \<file> ::= {\<symbol>}.rod
-+ \<import> ::= import "\<file>"
++ \<import> ::= import `"`\<file>`"`
 
 
 + \<program_things> ::= \<import> | \<function_declaration> | \<function_definition> | \<declaration> | \<definition>

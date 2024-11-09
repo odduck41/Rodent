@@ -1,15 +1,22 @@
 #pragma once
 #include <string>
+
+#include "basic.hpp"
 #include "files.hpp"
+#include <vector>
+
+inline std::vector<Token> parseOperations(const std::wstring&, size_t);
 
 namespace lexer {
+
 inline void removeComments(size_t, wchar_t*&);
+
 
 class Trie {
  public:
   explicit Trie(const char* filename);
 
-  bool check(const std::wstring&) const;
+  [[nodiscard]] bool check(const std::wstring&) const;
 
  private:
   struct Node {
@@ -19,10 +26,13 @@ class Trie {
 
   Node* root = new Node;
 
-  void process(RFile& file, const long long size_);
+  void process(RFile& file, long long size_) const;
 
-  void addAll(const wchar_t*);
+  void addAll(const wchar_t*) const;
 
-  void add(wchar_t, Node*);
+  static void add(wchar_t, Node*&);
+
+  friend bool inTrie(const wchar_t* s, const Trie::Node* trie, size_t sz);
+  friend bool inTrie(const std::wstring& s, const Trie::Node* trie, size_t sz);
 };
 }  // namespace lexer

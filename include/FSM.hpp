@@ -3,11 +3,11 @@
 #include "lexer.hpp"
 
 #include <iostream>
+#include "basic.hpp"
 #include <string>
 #include <vector>
 
 namespace lexer {
-// std::vector<Token> operations(const std::string&, size_t);
 
 namespace states {
 struct State {
@@ -39,28 +39,6 @@ struct Operation : virtual Event {};
 struct Semicolor : virtual Event {};
 }  // namespace events
 
-enum class Lexeme {
-  Reserved,
-  Identifier,
-  Type,
-  Literal,
-  StringLiteral,
-  Operation,
-  Punctuation,
-  Semicolon,
-  OpenParentheses,
-  CloseParentheses,
-  OpenCurly,
-  CloseCurly,
-  Other
-};
-
-struct Token {
-  Lexeme type{Lexeme::Other};
-  std::wstring content{};
-  size_t line{};
-};
-
 class FiniteStateMachine {
  public:
   FiniteStateMachine(const char* programm_text, size_t programm_lenght);
@@ -70,11 +48,11 @@ class FiniteStateMachine {
   ~FiniteStateMachine() = default;
 
  private:
-  const char* programm_text_;
-  size_t programm_lenght_;
+  const char* program_text_;
+  size_t program_lenght_;
   std::vector<Token> tokens_;
   size_t curr_line_ = 1;
-  Trie reserwed_words_;
+  Trie reserved_words_;
   Trie type_words_;
 
   void startProcessText();
@@ -86,6 +64,7 @@ class FiniteStateMachine {
   void applyState(states::RTI state);
   void applyState(states::Literal state);
   void applyState(states::StringLiteral state);
+  // Блять, Артём, я конечно всё понимаю, но пиши, пожалуйста свои комментарии так, что они не кидали Typo
   void applyState(states::State state);  // Кидвет искоючение
 
   // Извините конечно, но этот пиздец надо было сделать
