@@ -89,7 +89,7 @@
 
 + \<switch> ::= switch(\<identifier>) `{`{case \<literal> : {\<statement>}} \[default : {\<statement>}]`}`
 
-+ \<statement> ::= \<if> | \<while> | \<for> | \<do-while> | \<switch> | \<return> | \<expression> | `break` | `continue`
++ \<statement> ::= \<if> | \<while> | \<for> | \<do-while> | \<switch> | \<return> | \<expression> | `break` | `continue` | \<definition>
 
 # Functions
 
