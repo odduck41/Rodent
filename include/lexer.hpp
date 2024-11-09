@@ -5,8 +5,6 @@
 #include "files.hpp"
 #include <vector>
 
-inline std::vector<Token> parseOperations(const std::wstring&, size_t);
-
 namespace lexer {
 
 inline void removeComments(size_t, wchar_t*&);
@@ -36,3 +34,5 @@ class Trie {
   friend bool inTrie(const std::wstring& s, const Trie::Node* trie, size_t sz);
 };
 }  // namespace lexer
+
+std::vector<Token> parseOperations(const std::wstring & seq, size_t line);
