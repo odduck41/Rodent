@@ -2,6 +2,7 @@
 
 #include "lexer.hpp"
 
+extern lexer::Trie imported_;
 
 class Parser {
     public:
@@ -17,23 +18,22 @@ class Parser {
         void body_();
         void statement_();
 
-        void switch_();
-        void doWhile_();
-        void for_();
+        void switch_(){};
+        void doWhile_(){};
+        void for_(){};
         void while_();
-        void if_();
-        void definition_();
-        void expression();
+        void if_(){};
+        void definition_(){};
+        void expression(){};
 
-        void functionCall_();
-        void given_();
+        void functionCall_(){};
+        void given_(){};
 
 
 
         bool get();
         std::vector<Token> program;
         Token now;
-        static lexer::Trie imported_;
 
 };
 

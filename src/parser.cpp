@@ -3,6 +3,8 @@
 #include "exceptions.hpp"
 #include <cstdlib>
 
+lexer::Trie imported_;
+
 bool Parser::get() {
     static size_t now_ = -1;
     ++now_;
@@ -89,6 +91,7 @@ void Parser::arguments_() {
         get();
         if (now.type != Lexeme::Identifier) throw bad_lexeme(now);
         get();
+        if (now.type == Lexeme::CloseParentheses) return;
         if (now.type == Lexeme::Punctuation && now.content == L",") {
             get();
             continue;
@@ -117,7 +120,6 @@ void Parser::arguments_() {
 }
 
 void Parser::body_() {
-    get();
     while (now.type != Lexeme::CloseCurly) {
         statement_();
     }
