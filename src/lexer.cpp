@@ -7,31 +7,6 @@
 #include <utility>
 
 namespace lexer {
-
-bool inTrie(const wchar_t* s, const Trie::Node* trie, const size_t sz) {
-    if (s[sz] == '\0' && trie->terminal) {
-      return true;
-    }
-    if (s[sz] == '\0') {
-      return false;
-    }
-
-    if (trie->children[s[sz] - 'a'] == nullptr) return false;
-    return inTrie(s, trie->children[s[sz] - 'a'], sz + 1);
-}
-
-bool inTrie(const std::wstring& s, const Trie::Node* trie, size_t sz) {
-    if (sz == s.size() && trie->terminal) {
-      return true;
-    }
-    if (sz == s.size()) {
-      return false;
-    }
-
-    if (trie->children[s[sz] - 'a'] == nullptr) return false;
-    return inTrie(s, trie->children[s[sz] - 'a'], sz + 1);
-}
-
 inline void removeComments(const size_t sz, wchar_t*& program) {
     std::wstring result;
     result.reserve(sz + 1);
@@ -87,6 +62,14 @@ Trie::Trie(const char* filename) {
   process(file, file.size());
 }
 
+bool Trie::check(const wchar_t* s) const {
+    return check_(s, root);
+}
+
+bool Trie::check(const std::wstring& s) const {
+    return check_(s, root);
+}
+
 void Trie::process(RFile& file, const long long size_) const {
   const auto str = new wchar_t[size_ + 1];
   file.read(str, size_);
@@ -117,19 +100,31 @@ void Trie::add(const wchar_t s, Node*& curr_node) {
   curr_node = curr_node->children[s - 'a'];
 }
 
-bool Trie::check(const std::wstring& s) const {
-  size_t sz = s.size();
-  if (sz == s.size() && this->root->terminal) {
-    return true;
-  }
-  if (sz == s.size()) {
-    return false;
-  }
 
-  if (this->root->children[s[sz] - 'a'] == nullptr)
-    return false;
-  return inTrie(s, this->root->children[s[sz] - 'a'], sz + 1);
+bool Trie::check_(const wchar_t* s, const Trie::Node* trie, const size_t sz) {
+    if (s[sz] == '\0' && trie->terminal) {
+      return true;
+    }
+    if (s[sz] == '\0') {
+      return false;
+    }
+
+    if (trie->children[s[sz] - 'a'] == nullptr) return false;
+    return check_(s, trie->children[s[sz] - 'a'], sz + 1);
 }
+
+bool Trie::check_(const std::wstring& s, const Trie::Node* trie, const size_t sz) {
+    if (sz == s.size() && trie->terminal) {
+      return true;
+    }
+    if (sz == s.size()) {
+      return false;
+    }
+
+    if (trie->children[s[sz] - 'a'] == nullptr) return false;
+    return check_(s, trie->children[s[sz] - 'a'], sz + 1);
+}
+
 }  // namespace lexer
 
 

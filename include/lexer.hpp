@@ -14,6 +14,8 @@ class Trie {
  public:
   explicit Trie(const char* filename);
 
+  bool check(const wchar_t*) const;
+
   [[nodiscard]] bool check(const std::wstring&) const;
 
  private:
@@ -30,8 +32,9 @@ class Trie {
 
   static void add(wchar_t, Node*&);
 
-  friend bool inTrie(const wchar_t* s, const Trie::Node* trie, size_t sz);
-  friend bool inTrie(const std::wstring& s, const Trie::Node* trie, size_t sz);
+  static bool check_(const wchar_t*, const Trie::Node*, size_t = 0);
+
+  static bool check_(const std::wstring&, const Trie::Node*, size_t = 0);
 };
 }  // namespace lexer
 

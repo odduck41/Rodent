@@ -4,72 +4,78 @@
 #include <iostream>
 #include <cassert>
 
-// inline void Trie() {
-//     assert(inTrie(L"import", reserved) == true);
-//
-//     assert(inTrie(L"func", reserved) == true);
-//     assert(inTrie(L"return", reserved) == true);
-//
-//     assert(inTrie(L"do", reserved) == true);
-//     assert(inTrie(L"while", reserved) == true);
-//     assert(inTrie(L"for", reserved) == true);
-//
-//
-//     assert(inTrie(L"continue", reserved) == true);
-//     assert(inTrie(L"break", reserved) == true);
-//
-//
-//     assert(inTrie(L"if", reserved) == true);
-//     assert(inTrie(L"else", reserved) == true);
-//     assert(inTrie(L"elif", reserved) == true);
-//
-//
-//     assert(inTrie(L"switch", reserved) == true);
-//     assert(inTrie(L"case", reserved) == true);
-//
-//
-//
-//     assert(inTrie(L"impo", reserved) == false);
-//
-//     assert(inTrie(L"fun678c", reserved) == false);
-//     assert(inTrie(L"retur8n", reserved) == false);
-//
-//     assert(inTrie(L"dofj", reserved) == false);
-//     assert(inTrie(L"whifje", reserved) == false);
-//     assert(inTrie(L"fofjr", reserved) == false);
-//
-//
-//     assert(inTrie(L"contin", reserved) == false);
-//     assert(inTrie(L"bre", reserved) == false);
-//
-//
-//     assert(inTrie(L"iffgj", reserved) == false);
-//     assert(inTrie(L"elsejg", reserved) == false);
-//     assert(inTrie(L"elifghj", reserved) == false);
-//
-//
-//     assert(inTrie(L"switchfgj", reserved) == false);
-//     assert(inTrie(L"ca", reserved) == false);
-//
-//     assert(inTrie(L"int", types) == true);
-//     assert(inTrie(L"double", types) == true);
-//     assert(inTrie(L"wchar_t", types) == true);
-//     assert(inTrie(L"bool", types) == true);
-//     assert(inTrie(L"str", types) == true);
-//     assert(inTrie(L"array", types) == true);
-//
-//
-//     assert(inTrie(L"i", types) == false);
-//     assert(inTrie(L"doubl", types) == false);
-//     assert(inTrie(L"cha", types) == false);
-//     assert(inTrie(L"boo", types) == false);
-//     assert(inTrie(L"std", types) == false);
-//     assert(inTrie(L"arra", types) == false);
-// }
+inline void Trie() {
+    lexer::Trie a("../assets/reserved.txt");
+    lexer::Trie b("../assets/types.txt");
+
+    assert(a.check(L"import") == true);
+
+    assert(a.check(L"func") == true);
+    assert(a.check(L"return") == true);
+
+    assert(a.check(L"do") == true);
+    assert(a.check(L"while") == true);
+    assert(a.check(L"for") == true);
+
+
+    assert(a.check(L"continue") == true);
+    assert(a.check(L"break") == true);
+
+
+    assert(a.check(L"if") == true);
+    assert(a.check(L"else") == true);
+    assert(a.check(L"elif") == true);
+
+
+    assert(a.check(L"switch") == true);
+    assert(a.check(L"case") == true);
+
+
+
+    assert(a.check(L"impo") == false);
+
+    assert(a.check(L"fun678c") == false);
+    assert(a.check(L"retur8n") == false);
+
+    assert(a.check(L"dofj") == false);
+    assert(a.check(L"whifje") == false);
+    assert(a.check(L"fofjr") == false);
+
+
+    assert(a.check(L"contin") == false);
+    assert(a.check(L"bre") == false);
+
+
+    assert(a.check(L"iffgj") == false);
+    assert(a.check(L"elsejg") == false);
+    assert(a.check(L"elifghj") == false);
+
+
+    assert(a.check(L"switchfgj") == false);
+    assert(a.check(L"ca") == false);
+
+    assert(b.check(L"int") == true);
+    assert(b.check(L"double") == true);
+    // assert(b.check(L"wchar_t") == true);
+    /// Блять Артём Ну ты и долбоёб конечно, сука, алё, какой wchar_t, в самом языке его не будет
+    /// Оно есть только у нас, в языке просто str
+    assert(b.check(L"bool") == true);
+    assert(b.check(L"str")== true);
+    assert(b.check(L"array") == true);
+
+
+    assert(b.check(L"i") == false);
+    assert(b.check(L"doubl") == false);
+    assert(b.check(L"cha") == false);
+    assert(b.check(L"boo") == false);
+    assert(b.check(L"std") == false);
+    assert(b.check(L"arra") == false);
+}
 
 inline void operations() {
     std::wstring a;
-    std::wcin >> a;
+    // >>=&&|=||=-=**=*->
+    std::getline(std::wcin, a);
     auto ans = parseOperations(a, 1);
     for (auto& i : ans) {
         std::wcout << i.content << std::endl;

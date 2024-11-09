@@ -6,6 +6,7 @@
 int main(int argc, const char** argv) {
 
   // doFlags(argc, argv);
+  Trie();
   operations();
   return 0;
 }
