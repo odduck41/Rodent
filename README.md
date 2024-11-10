@@ -10,7 +10,7 @@ import "file.rod"
   comment
 */
 
-// also cooment
+// also comment
 func gcd(int a, int b) -> int {
     while (a && b) {
         if (a > b) {
