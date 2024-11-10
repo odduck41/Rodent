@@ -1,6 +1,5 @@
 #pragma once
 
-
 enum class Lexeme {
     Reserved,
     Identifier,
@@ -16,7 +15,6 @@ enum class Lexeme {
     CloseCurly,
     Other
 };
-
 
 struct Token {
     Lexeme type{Lexeme::Other};

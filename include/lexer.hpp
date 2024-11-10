@@ -1,14 +1,15 @@
 #pragma once
 #include <string>
 
+#include <vector>
 #include "basic.hpp"
 #include "files.hpp"
-#include <vector>
 
 namespace lexer {
 
-inline void removeComments(size_t, wchar_t*&);
+void removeComments(size_t, wchar_t*&);
 
+std::vector<Token> parseOperations(const std::wstring& seq, size_t line);
 
 class Trie {
  public:
@@ -37,5 +38,3 @@ class Trie {
   static bool check_(const std::wstring&, const Trie::Node*, size_t = 0);
 };
 }  // namespace lexer
-
-std::vector<Token> parseOperations(const std::wstring & seq, size_t line);
