@@ -76,7 +76,7 @@ inline void operations() {
     std::wstring a;
     // >>=&&|=||=-=**=*->
     std::getline(std::wcin, a);
-    auto ans = parseOperations(a, 1);
+    auto ans = lexer::parseOperations(a, 1);
     for (auto& i : ans) {
         std::wcout << i.content << std::endl;
     }
