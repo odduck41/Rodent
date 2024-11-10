@@ -19,5 +19,5 @@ func gcd(int a, int b) -> int { // gcd func
 }
 
 func main() -> int {
-    return gcd( 543, 4532);
+    return gcd(543, 4532);
 }

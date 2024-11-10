@@ -71,6 +71,8 @@ void Parser::functionDefinition_() {
 
     arguments_();
 
+    if (now.type != Lexeme::CloseParentheses) throw bad_lexeme(now);
+
     get();
     if (now.type != Lexeme::Operation || now.content != L"->") throw bad_lexeme(now);
 
@@ -120,25 +122,26 @@ void Parser::arguments_() {
 }
 
 void Parser::body_() {
+    get();
+    if (now.type == Lexeme::CloseCurly) return;
     while (now.type != Lexeme::CloseCurly) {
         statement_();
     }
 }
 
 void Parser::statement_() {
-    get();
-    if (now.type == Lexeme::CloseCurly) return;
     if (now.type == Lexeme::Reserved) {
         if (now.content == L"if") if_();
         else if (now.content == L"switch") switch_();
         else if (now.content == L"while") while_();
         else if (now.content == L"do") doWhile_();
         else if (now.content == L"for") for_();
+        else if (now.content == L"return") return_();
         else throw bad_lexeme(now);
     } else if (now.type == Lexeme::Type) {
         definition_();
     } else if (now.type != Lexeme::Other) {
-        expression();
+        expression_();
     } else throw bad_lexeme(now);
 }
 
@@ -146,7 +149,7 @@ void Parser::while_() {
     get();
     if (now.type != Lexeme::OpenParentheses) throw bad_lexeme(now);
 
-    expression();
+    expr_();
 
     if (now.type != Lexeme::CloseParentheses) throw bad_lexeme(now);
 
@@ -157,7 +160,261 @@ void Parser::while_() {
     while (now.type != Lexeme::CloseCurly) {
         statement_();
     }
+    get();
 }
 
+void Parser::if_() {
+    get();
+    if (now.type != Lexeme::OpenParentheses) throw bad_lexeme(now);
 
+    expr_();
 
+    if (now.type != Lexeme::CloseParentheses) throw bad_lexeme(now);
+
+    get();
+    if (now.type != Lexeme::OpenCurly) throw bad_lexeme(now);
+
+    get();
+    while (now.type != Lexeme::CloseCurly) {
+        statement_();
+    }
+    get();
+    if (now.type == Lexeme::Reserved && now.content == L"else") {
+        get();
+        if (now.type == Lexeme::Reserved && now.content == L"if") {
+            if_();
+            return;
+        }
+        if (now.type != Lexeme::OpenCurly) throw bad_lexeme(now);
+        while (now.type != Lexeme::CloseCurly) {
+            statement_();
+        }
+        get();
+        return;
+    }
+
+    if (now.type == Lexeme::Reserved && now.content == L"elif") if_();
+}
+
+void Parser::return_() {
+    expression_();
+    if (now.type != Lexeme::CloseCurly) throw bad_lexeme(now);
+}
+
+void Parser::expression_() {
+    if (now.type == Lexeme::Semicolon) return;
+    expr_();
+
+    if (now.type != Lexeme::Semicolon) throw bad_lexeme(now);
+}
+
+void Parser::expr_() {
+    expr0_();
+}
+
+void Parser::expr0_() {
+    expr1_();
+    while (now.type == Lexeme::Operation) {
+        if (now.content != L",") return;
+        get();
+        expr1_();
+    }
+
+    if (now.type == Lexeme::Other) throw bad_lexeme(now);
+}
+
+bool Parser::op1(const std::wstring& s) {
+    return s == L"=" ||
+        s == L"+=" || s == L"-=" || s == L"*=" || s == L"/=" ||
+        s == L"%=" || s == L"&=" || s == L"|=" || s == L"^=" ||
+        s == L"<<=" || s == L">>=";
+}
+
+void Parser::expr1_() {
+    expr2_();
+    while (now.type == Lexeme::Operation) {
+        if (!op1(now.content)) return;
+        get();
+        expr2_();
+    }
+
+    if (now.type == Lexeme::Other) throw bad_lexeme(now);
+}
+
+void Parser::expr2_() {
+    expr3_();
+    while (now.type == Lexeme::Operation) {
+        if (now.content != L"||") return;
+        get();
+        expr3_();
+    }
+
+    if (now.type == Lexeme::Other) throw bad_lexeme(now);
+}
+
+void Parser::expr3_() {
+    expr4_();
+    while (now.type == Lexeme::Operation) {
+        if (now.content != L"&&") return;
+        get();
+        expr4_();
+    }
+
+    if (now.type == Lexeme::Other) throw bad_lexeme(now);
+}
+
+void Parser::expr4_() {
+    expr5_();
+    while (now.type == Lexeme::Operation) {
+        if (now.content != L"|") return;
+        get();
+        expr5_();
+    }
+
+    if (now.type == Lexeme::Other) throw bad_lexeme(now);
+}
+
+void Parser::expr5_() {
+    expr6_();
+    while (now.type == Lexeme::Operation) {
+        if (now.content != L"&") return;
+        get();
+        expr6_();
+    }
+
+    if (now.type == Lexeme::Other) throw bad_lexeme(now);
+}
+
+void Parser::expr6_() {
+    expr7_();
+    while (now.type == Lexeme::Operation) {
+        if (now.content != L"==" && now.content != L"!=") return;
+        get();
+        expr7_();
+    }
+
+    if (now.type == Lexeme::Other) throw bad_lexeme(now);
+}
+
+bool Parser::op7(const std::wstring& s) {
+    return s == L">" || s == L"<" || s == L"<=" || s == L">="; // || s == L"<=>";
+}
+
+void Parser::expr7_() {
+    expr8_();
+    while (now.type == Lexeme::Operation) {
+        if (!op7(now.content)) return;
+        get();
+        expr8_();
+    }
+
+    if (now.type == Lexeme::Other) throw bad_lexeme(now);
+}
+
+void Parser::expr8_() {
+    expr9_();
+    while (now.type == Lexeme::Operation) {
+        if (now.content != L">>" && now.content != L"<<") return;
+        get();
+        expr9_();
+    }
+
+    if (now.type == Lexeme::Other) throw bad_lexeme(now);
+}
+
+void Parser::expr9_() {
+    expr10_();
+    while (now.type == Lexeme::Operation) {
+        if (now.content != L"+" && now.content != L"-") return;
+        get();
+        expr10_();
+    }
+
+    if (now.type == Lexeme::Other) throw bad_lexeme(now);
+}
+
+void Parser::expr10_() {
+    expr11_();
+    while (now.type == Lexeme::Operation) {
+        if (now.content != L"*" && now.content != L"/" && now.content != L"%") return;
+        get();
+        expr11_();
+    }
+    if (now.type == Lexeme::Other) throw bad_lexeme(now);
+}
+
+bool Parser::op11(const std::wstring& s) {
+    return s == L"!" || s == L"++" || s == L"--" || s == L"+" || s == L"-";
+}
+
+void Parser::expr11_() {
+    while (now.type == Lexeme::Operation) {
+        if (!op11(now.content)) return;
+        get();
+    }
+    if (now.type == Lexeme::Other) throw bad_lexeme(now);
+    expr12_();
+}
+
+void Parser::expr12_() {
+    expr13_();
+    while (now.type == Lexeme::Operation) {
+        if (now.content != L"++" || now.content != L"--") return;
+        get();
+    }
+    if (now.type == Lexeme::Other) throw bad_lexeme(now);
+}
+
+void Parser::expr13_() {
+    atom();
+
+    if (now.type == Lexeme::Other) throw bad_lexeme(now);
+
+    if (now.content == L".") {
+        get();
+        if (now.type != Lexeme::Identifier) return;
+        get();
+        return;
+    }
+
+    if (now.content != L"[") return;
+    expr_();
+
+    if (now.type == Lexeme::Other) throw bad_lexeme(now);
+
+    if (now.content != L"]") return;
+    get();
+}
+
+void Parser::atom() {
+    if (now.type != Lexeme::Identifier && now.type != Lexeme::Literal && now.type != Lexeme::StringLiteral) {
+        if (now.content == L"(") expr0_();
+        if (now.content != L")") throw bad_lexeme(now);
+    }
+    if (now.type == Lexeme::Literal || now.type == Lexeme::StringLiteral) {
+        get();
+        return;
+    }
+    get();
+    if (now.type == Lexeme::Operation) return;
+    if (now.type == Lexeme::Other) throw bad_lexeme(now);
+    if (now.type != Lexeme::OpenParentheses) return;
+    functionCall_();
+    get();
+}
+
+void Parser::functionCall_() {
+    get();
+    given_();
+    if (now.type != Lexeme::CloseParentheses) throw bad_lexeme(now);
+}
+
+void Parser::given_() {
+    if (now.type == Lexeme::CloseParentheses) return;
+    expr_();
+    while (now.content == L",") {
+        expr_();
+    }
+    if (now.type == Lexeme::Other) throw bad_lexeme(now);
+    if (now.type != Lexeme::CloseParentheses) throw bad_lexeme(now);
+}

@@ -67,7 +67,7 @@
 + \<expr13> ::= \<atom>`[`\<expression>`]` | \<atom>`.`\<identifier>
 + \<atom> ::= \<identifier> | \<literal> | \<function_call> | (\<expr0>)
 
-+ \<expr> ::= \<expr0> | \<atom>
++ \<expr> ::= \<expr0>
 + \<expression> ::= \<expr>`;` | `;`
 
 # Variables
@@ -79,13 +79,13 @@
 
 # Operands
 
-+ \<if> ::= if (\<expression>) `{`{\<statement>}`}` { else \<if> | elif (\<expression>) `{`{\<statement>}`}` } \[else `{`{\<statement>}`}`]
++ \<if> ::= if (\<expr>) `{`{\<statement>}`}` { else \<if> | elif (\<expression>) `{`{\<statement>}`}` } \[else `{`{\<statement>}`}`]
 
-+ \<while> ::= while (\<expression>) `{`{\<loop-statement>}`}`
++ \<while> ::= while (\<expr>) `{`{\<loop-statement>}`}`
 
-+ \<for> ::= for (\[\<expression>]; \[\<expression>]; \[\<expression>]) `{`{\<loop-statement>}`}`
++ \<for> ::= for (\[\<expr>]; \[\<expr>]; \[\<expr>]) `{`{\<statement>}`}`
 
-+ \<do-while> ::= do `{`{\<loop-statement>}`}` while (\<expression>)
++ \<do-while> ::= do `{`{\<statement>}`}` while (\<expr>)
 
 + \<switch> ::= switch(\<identifier>) `{`{case \<literal> : {\<statement>}} \[default : {\<statement>}]`}`
 
