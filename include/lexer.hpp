@@ -14,8 +14,9 @@ std::vector<Token> parseOperations(const std::wstring& seq, size_t line);
 class Trie {
  public:
   explicit Trie(const char* filename);
-
+  Trie() = default;
   bool check(const wchar_t*) const;
+  void add(const wchar_t*) const;
 
   [[nodiscard]] bool check(const std::wstring&) const;
 

@@ -157,6 +157,13 @@ bool Trie::check(const wchar_t* s) const {
   return check_(s, root);
 }
 
+void Trie::add(const wchar_t* str) const {
+  Node* current = root;
+  for (size_t i = 0; str[i] != '\0'; ++i) {
+      add(str[i], current);
+  }
+}
+
 bool Trie::check(const std::wstring& s) const {
   return check_(s, root);
 }

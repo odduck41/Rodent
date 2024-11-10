@@ -23,11 +23,9 @@ static void defineFlags() {
   function<const char*>['l'] = &lex;
 }
 
-static void doAll() {
-  // loadReserved();
-  // loadTypes();
-
-  // test();
+static void doAll(const std::string& filename = filename) {
+    // loadReserved();
+    // loadTypes();
 
   RFile file(filename.c_str());
   const long long size_ = file.size();
