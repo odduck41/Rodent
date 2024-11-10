@@ -1,12 +1,16 @@
+
 #include "common.hpp"
 #include "parser.hpp"
 #include "Test.h"
-#include <windows.h>
 // #include "FSM.hpp"
 // #include <exceptions.hpp>
 
 int main(int argc, const char** argv) {
+  doFlags(argc, argv);
+  // Trie();
+  // operations();
 
+  doAll();
   // doFlags(argc, argv);
   // Trie();
   // operations();

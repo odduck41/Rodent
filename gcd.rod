@@ -19,10 +19,10 @@ func main() -> int  {
     gcd2(2, b);
     do {
         a += 1;
-    } while (a == 1)
+    } while (a == 1);
 }
 
 func gcd2(int a, int b) -> int {
     return a + b;
-    ++0-=-=-=-=a+_=da=d-dpwad+_D=wdkapkdpawd'
+    ++0-=-=-=-=a+=da=d-dpwad+D=wdkapkdpawd
 }
