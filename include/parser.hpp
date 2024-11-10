@@ -50,6 +50,7 @@ class Parser {
 
         void functionCall_();
         void given_();
+        void inline_body_();
 
 
 

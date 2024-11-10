@@ -69,9 +69,12 @@ void Parser::functionDefinition_() {
     get();
     if (now.type != Lexeme::OpenParentheses) throw bad_lexeme(now);
 
-    arguments_();
+    get();
 
-    if (now.type != Lexeme::CloseParentheses) throw bad_lexeme(now);
+    if (now.type != Lexeme::CloseParentheses) {
+        arguments_();
+    }
+
 
     get();
     if (now.type != Lexeme::Operation || now.content != L"->") throw bad_lexeme(now);
@@ -87,7 +90,6 @@ void Parser::functionDefinition_() {
 }
 
 void Parser::arguments_() {
-    get();
     while(now.type != Lexeme::CloseParentheses) {
         if (now.type != Lexeme::Type) throw bad_lexeme(now);
         get();
@@ -129,6 +131,11 @@ void Parser::body_() {
     }
 }
 
+void Parser::inline_body_() {
+    body_();
+    get();
+}
+
 void Parser::statement_() {
     if (now.type == Lexeme::Reserved) {
         if (now.content == L"if") if_();
@@ -149,6 +156,7 @@ void Parser::while_() {
     get();
     if (now.type != Lexeme::OpenParentheses) throw bad_lexeme(now);
 
+    get();
     expr_();
 
     if (now.type != Lexeme::CloseParentheses) throw bad_lexeme(now);
@@ -156,17 +164,14 @@ void Parser::while_() {
     get();
     if (now.type != Lexeme::OpenCurly) throw bad_lexeme(now);
 
-    get();
-    while (now.type != Lexeme::CloseCurly) {
-        statement_();
-    }
-    get();
+    inline_body_();
 }
 
 void Parser::if_() {
     get();
     if (now.type != Lexeme::OpenParentheses) throw bad_lexeme(now);
 
+    get();
     expr_();
 
     if (now.type != Lexeme::CloseParentheses) throw bad_lexeme(now);
@@ -174,11 +179,7 @@ void Parser::if_() {
     get();
     if (now.type != Lexeme::OpenCurly) throw bad_lexeme(now);
 
-    get();
-    while (now.type != Lexeme::CloseCurly) {
-        statement_();
-    }
-    get();
+    inline_body_();
     if (now.type == Lexeme::Reserved && now.content == L"else") {
         get();
         if (now.type == Lexeme::Reserved && now.content == L"if") {
@@ -186,10 +187,7 @@ void Parser::if_() {
             return;
         }
         if (now.type != Lexeme::OpenCurly) throw bad_lexeme(now);
-        while (now.type != Lexeme::CloseCurly) {
-            statement_();
-        }
-        get();
+        inline_body_();
         return;
     }
 
@@ -197,15 +195,18 @@ void Parser::if_() {
 }
 
 void Parser::return_() {
+    get();
     expression_();
     if (now.type != Lexeme::CloseCurly) throw bad_lexeme(now);
 }
 
 void Parser::expression_() {
     if (now.type == Lexeme::Semicolon) return;
+
     expr_();
 
     if (now.type != Lexeme::Semicolon) throw bad_lexeme(now);
+    get();
 }
 
 void Parser::expr_() {
@@ -413,6 +414,7 @@ void Parser::given_() {
     if (now.type == Lexeme::CloseParentheses) return;
     expr_();
     while (now.content == L",") {
+        get();
         expr_();
     }
     if (now.type == Lexeme::Other) throw bad_lexeme(now);
