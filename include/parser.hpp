@@ -6,7 +6,7 @@ extern lexer::Trie imported_;
 
 class Parser {
     public:
-        Parser(const std::vector<Token>&);
+        explicit Parser(const std::vector<Token>&);
     private:
         void program_();
 
@@ -18,13 +18,13 @@ class Parser {
         void body_();
         void statement_();
 
-        void switch_(){};
-        void doWhile_(){};
-        void for_(){};
+        void switch_() {};
+        void doWhile_();
+        void for_() {};
         void while_();
         void if_();
         void return_();
-        void definition_(){};
+        void definition_() {};
         void expression_();
 
         void expr_();

@@ -55,7 +55,7 @@ void Parser::import_() {
 
         delete[] buffer;
 
-        doAll(filename);
+        // doAll(filename);
 
     } else {
         throw bad_lexeme(now);
@@ -150,6 +150,28 @@ void Parser::statement_() {
     } else if (now.type != Lexeme::Other) {
         expression_();
     } else throw bad_lexeme(now);
+}
+
+// void Parser::switch_() {
+//
+// }
+
+void Parser::doWhile_() {
+    get();
+    if (now.type != Lexeme::OpenCurly) throw bad_lexeme(now);
+    inline_body_();
+    if (now.type != Lexeme::Reserved && now.content != L"while") throw bad_lexeme(now);
+
+    get();
+    if (now.type != Lexeme::OpenParentheses) throw bad_lexeme(now);
+
+    get();
+    expr_();
+
+    if (now.type != Lexeme::CloseParentheses) throw bad_lexeme(now);
+    get();
+    if (now.type != Lexeme::Semicolon) throw bad_lexeme(now);
+    get();
 }
 
 void Parser::while_() {
