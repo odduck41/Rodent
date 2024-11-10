@@ -1,23 +1,28 @@
+import "abc.rod"
 
-func gcd(int a, int b) -> int { // gcd func
-/*
-    this function returns gcd of a and b
-*/
-    while (a && b) { // circle
+func gcd(int a, int b) -> int {
+    while (a && b) {
+        do {} while(0);
         if (a > b) {
+            a &= 4;
             a %= b;
         } else {
-            b %= a;
+            b = a;
+            c == a;
         }
-    } // end
-
-/*
-    now one of the values a or b is equal to gcd, and other is zero
-*/
-    return a + b; // so we can return a + b
-    ++----++==*&%!dsao int 1232 0x123 0b1010101010 jfwoqi; // Ну пиздец ты насрал блин Лев
+    }
+    return 34;
 }
 
-func main() -> int {
-    return gcd( 543, 4532);
+func main() -> int  {
+    gcd(a, b);
+    gcd2(2, b);
+    do {
+        a += 1;
+    } while (a == 1);
+}
+
+func gcd2(int a, int b) -> int {
+    return a + b;
+    ++0-=-=-=-=a+=da=d-dpwad+D=wdkapkdpawd
 }
