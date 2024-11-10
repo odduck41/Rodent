@@ -26,5 +26,6 @@ func gcd2(int a, int b) -> int {
     return a + b;
     a += 34;
     ++a;
+    a++;
     ++AS0-=-=-=-=a+=da=d-dpwad+D=wdkapkdpawd;
 }

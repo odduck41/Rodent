@@ -5,29 +5,28 @@
 #include <codecvt>
 #include <cstdint>
 #include <cstdio>
-#include <cwctype>
+// #include <cwctype>
 #include <locale>
-#include <optional>
+// #include <optional>
+// #include <utility>
 
 namespace lexer {
 FiniteStateMachine::FiniteStateMachine(const wchar_t* program_text,
-                                       size_t program_lenght)
-    : reserved_words_("../assets/reserved.txt"),
-      type_words_("../assets/types.txt"),
-      program_text_(program_text),
-      program_lenght_(program_lenght) {
+                                       const size_t program_length)
+    : program_text_(program_text),
+      program_length_(program_length),
+      reserved_words_("../assets/reserved.txt"),
+      type_words_("../assets/types.txt") {
   startProcessText();
 }
 
 void FiniteStateMachine::operations(const std::wstring& str) {
-  std::vector<Token> new_tokens = parseOperations(str, curr_line_);
-
-  for (Token& new_token : new_tokens) {
+  for (std::vector<Token> new_tokens = parseOperations(str, curr_line_); Token& new_token : new_tokens) {
     tokens_.push_back(new_token);
   }
 }
 
-void FiniteStateMachine::applyState(states::SpecialSymbols state) {
+void FiniteStateMachine::applyState(const states::SpecialSymbols &state) {
   if (state.curr_str.length() == 1) {
     if (state.curr_str[0] == static_cast<wchar_t>('{')) {
       tokens_.push_back({Lexeme::OpenCurly, state.curr_str, curr_line_});
@@ -49,7 +48,7 @@ void FiniteStateMachine::applyState(states::SpecialSymbols state) {
   }
 }
 
-void FiniteStateMachine::applyState(states::RTI state) {
+void FiniteStateMachine::applyState(const states::RTI& state) {
   if (reserved_words_.check(state.curr_str)) {
     tokens_.push_back({Lexeme::Reserved, state.curr_str, curr_line_});
   } else if (type_words_.check(state.curr_str)) {
@@ -59,7 +58,7 @@ void FiniteStateMachine::applyState(states::RTI state) {
   }
 }
 
-void FiniteStateMachine::applyState(states::Literal state) {
+void FiniteStateMachine::applyState(const states::Literal &state) {
   enum NumberBases { Binary, Decimal, Hexadecimal } curr_number_base;
   std::wstring curr_number_wstring;
   if (state.curr_str.length() >= 3) {
@@ -75,92 +74,100 @@ void FiniteStateMachine::applyState(states::Literal state) {
   }
 
   if (curr_number_base == Decimal) {
-    uint64_t number = stoi(state.curr_str);
+    const uint64_t number = stoi(state.curr_str);
     char curr_number_char_arr[17];
-    sprintf(curr_number_char_arr, "%016X", number);
-    std::string curr_number_string_arr(curr_number_char_arr);
+    sprintf(curr_number_char_arr, "%016llu", number);
+    const std::string curr_number_string_arr(curr_number_char_arr);
 
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
     curr_number_wstring = converter.from_bytes(curr_number_string_arr);
   } else if (curr_number_base == Binary) {
-    uint64_t number = stoi(state.curr_str.substr(2));
+    const uint64_t number = stoi(state.curr_str.substr(2));
     char curr_number_char_arr[17];
-    sprintf(curr_number_char_arr, "%016X", number);
-    std::string curr_number_string_arr(curr_number_char_arr);
+    sprintf(curr_number_char_arr, "%016llu", number);
+    const std::string curr_number_string_arr(curr_number_char_arr);
 
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
     curr_number_wstring = converter.from_bytes(curr_number_string_arr);
-  } else if (curr_number_base == Hexadecimal) {
+  } else {
     curr_number_wstring = state.curr_str.substr(2);
   }
 
   tokens_.push_back({Lexeme::Literal, curr_number_wstring, curr_line_});
 }
 
-void FiniteStateMachine::applyState(states::StringLiteral state) {
+void FiniteStateMachine::applyState(const states::StringLiteral& state) {
   tokens_.push_back({Lexeme::StringLiteral, state.curr_str, curr_line_});
 }
 
-void FiniteStateMachine::applyState(states::Other state) {
+void FiniteStateMachine::applyState(const states::Other& state) {
   tokens_.push_back({Lexeme::Other, state.curr_str, curr_line_});
 }
 
-void FiniteStateMachine::applyState(State state) {
+void FiniteStateMachine::applyState(const State& state) {
   throw lexer_error("Default applyState() has called");
 }
 
-Event FiniteStateMachine::getEvent(const wchar_t symbol) const {
+Event FiniteStateMachine::getEvent(const wchar_t symbol) {
   if (symbol == '.') {
-    events::Dot new_event;
-    new_event.symbol = symbol;
-    return new_event;
-  } else if (symbol == ' ') {
-    events::Space new_event;
-    new_event.symbol = symbol;
-    return new_event;
-  } else if (symbol == '_') {
-    events::Underline new_event;
-    new_event.symbol = symbol;
-    return new_event;
-  } else if (symbol == '{' || symbol == '}') {
-    events::Curly new_event;
-    new_event.symbol = symbol;
-    return new_event;
-  } else if (symbol == '"') {
-    events::Quotes new_event;
-    new_event.symbol = symbol;
-    return new_event;
-  } else if (symbol == '(' || symbol == ')') {
-    events::Parentheses new_event;
-    new_event.symbol = symbol;
-    return new_event;
-  } else if (symbol == '+' || symbol == '+' || symbol == '-' || symbol == '=' ||
-             symbol == '!' || symbol == '%' || symbol == '*' || symbol == '/' ||
-             symbol == '^' || symbol == '|' || symbol == '&' || symbol == '<' ||
-             symbol == '>' || symbol == ',' || symbol == '.' || symbol == '[' ||
-             symbol == ']' || symbol == ';' || symbol == ':') {
-    events::Operation new_event;
-    new_event.symbol = symbol;
-    return new_event;
-  } else if (symbol == 'x' || symbol == 'b') {
-    events::BaseSeparator new_event;
-    new_event.symbol = symbol;
-    return new_event;
-  } else if (symbol >= '0' && symbol <= '9') {
-    events::DecimalDigit new_event;
-    new_event.symbol = symbol;
-    return new_event;
-  } else if ((symbol >= '0' && symbol <= '9') ||
-             (symbol >= 'a' && symbol <= 'f') ||
-             (symbol >= 'A' && symbol <= 'F')) {
-    events::AllBasesDigit new_event;
-    new_event.symbol = symbol;
-    return new_event;
-  } else {
-    events::Letter new_event;
+    events::Dot new_event{};
     new_event.symbol = symbol;
     return new_event;
   }
+  if (symbol == ' ') {
+    events::Space new_event{};
+    new_event.symbol = symbol;
+    return new_event;
+  }
+  if (symbol == '_') {
+    events::Underline new_event{};
+    new_event.symbol = symbol;
+    return new_event;
+  }
+  if (symbol == '{' || symbol == '}') {
+    events::Curly new_event{};
+    new_event.symbol = symbol;
+    return new_event;
+  }
+  if (symbol == '"') {
+    events::Quotes new_event{};
+    new_event.symbol = symbol;
+    return new_event;
+  }
+  if (symbol == '(' || symbol == ')') {
+    events::Parentheses new_event{};
+    new_event.symbol = symbol;
+    return new_event;
+  }
+  if (symbol == '+' || symbol == '-' || symbol == '=' ||
+             symbol == '!' || symbol == '%' || symbol == '*' || symbol == '/' ||
+             symbol == '^' || symbol == '|' || symbol == '&' || symbol == '<' ||
+             symbol == '>' || symbol == ',' || symbol == '[' ||
+             symbol == ']' || symbol == ';' || symbol == ':') {
+    events::Operation new_event{};
+    new_event.symbol = symbol;
+    return new_event;
+  }
+  if (symbol == 'x' || symbol == 'b') {
+    events::BaseSeparator new_event{};
+    new_event.symbol = symbol;
+    return new_event;
+  }
+  if (symbol >= '0' && symbol <= '9') {
+    events::DecimalDigit new_event{};
+    new_event.symbol = symbol;
+    return new_event;
+  }
+  if ((symbol >= '0' && symbol <= '9') ||
+             (symbol >= 'a' && symbol <= 'f') ||
+             (symbol >= 'A' && symbol <= 'F')) {
+    events::AllBasesDigit new_event{};
+    new_event.symbol = symbol;
+    return new_event;
+  }
+  events::Letter new_event{};
+  new_event.symbol = symbol;
+  return new_event;
 }
 
 void FiniteStateMachine::startProcessText() {
@@ -201,160 +208,162 @@ void FiniteStateMachine::startProcessText() {
 }
 
 // Begin
-State FiniteStateMachine::onEvent(states::Begin state,
+State FiniteStateMachine::onEvent(const states::Begin& state,
                                           events::Space event) {
   return states::Begin{};
 }
 
-State FiniteStateMachine::onEvent(states::Begin state,
-                                          events::Curly event) {
+State FiniteStateMachine::onEvent(const states::Begin& state,
+                                  const events::Curly event) {
   applyState(states::SpecialSymbols(std::wstring(1, event.symbol)));
   return states::Begin{};
 }
 
-State FiniteStateMachine::onEvent(states::Begin state,
-                                          events::Parentheses event) {
+State FiniteStateMachine::onEvent(const states::Begin& state,
+                                  const events::Parentheses event) {
   applyState(states::SpecialSymbols(std::wstring(1, event.symbol)));
   return states::Begin{};
 }
 
-State FiniteStateMachine::onEvent(states::Begin state,
+State FiniteStateMachine::onEvent(const states::Begin& state,
                                           events::Quotes event) {
   return states::StringLiteral{};
 }
 
-State FiniteStateMachine::onEvent(states::Begin state,
-                                          events::DecimalDigit event) {
+State FiniteStateMachine::onEvent(const states::Begin& state,
+                                  const events::DecimalDigit event) {
   return states::Literal{std::wstring(1, event.symbol)};
 }
 
-State FiniteStateMachine::onEvent(states::Begin state,
-                                              events::BaseSeparator event) {
+State FiniteStateMachine::onEvent(const states::Begin& state,
+                                  const events::BaseSeparator event) {
   return states::RTI{std::wstring(1, event.symbol)};
 }
 
-State FiniteStateMachine::onEvent(states::Begin state,
-                                              events::Letter event) {
+State FiniteStateMachine::onEvent(const states::Begin& state,
+                                  const events::Letter event) {
   return states::RTI{std::wstring(1, event.symbol)};
 }
 
-State FiniteStateMachine::onEvent(states::Begin state,
-                                            events::AllBasesDigit event) {
+State FiniteStateMachine::onEvent(const states::Begin& state,
+                                  const events::AllBasesDigit event) {
   return states::RTI{std::wstring(1, event.symbol)};
 }
 
-State FiniteStateMachine::onEvent(states::Begin state,
-                                          events::Operation event) {
+State FiniteStateMachine::onEvent(const states::Begin& state,
+                                  const events::Operation event) {
   return states::SpecialSymbols{std::wstring(1, event.symbol)};
 }
 
-State FiniteStateMachine::onEvent(states::Begin state,
-                                          Event event) {
+State FiniteStateMachine::onEvent(const states::Begin& state,
+                                          Event event) const {
   return states::Other{std::wstring(1, *curr_symbol_)};
 }
 
 // StringLiteral
-State FiniteStateMachine::onEvent(states::StringLiteral state,
+State FiniteStateMachine::onEvent(const states::StringLiteral& state,
                                           events::Quotes event) {
   applyState(state);
   return states::Begin{};
 }
 
-State FiniteStateMachine::onEvent(states::StringLiteral state,
-                                          Event event) {
+State FiniteStateMachine::onEvent(const states::StringLiteral& state,
+                                          Event event) const {
   return states::StringLiteral{state.curr_str + std::wstring(1, *curr_symbol_)};
 }
 
 // Literal
-State FiniteStateMachine::onEvent(states::Literal state,
-                                          events::Dot event) {
+State FiniteStateMachine::onEvent(const states::Literal& state,
+                                  const events::Dot event) {
   return states::Literal{state.curr_str + std::wstring(1, event.symbol)};
 }
 
-State FiniteStateMachine::onEvent(states::Literal state,
-                                          events::BaseSeparator event) {
+State FiniteStateMachine::onEvent(const states::Literal& state,
+                                  const events::BaseSeparator event) {
   return states::Literal{state.curr_str + std::wstring(1, event.symbol)};
 }
 
-State FiniteStateMachine::onEvent(states::Literal state,
-                                            events::AllBasesDigit event) {
+State FiniteStateMachine::onEvent(const states::Literal& state,
+                                  const events::AllBasesDigit event) {
   return states::Literal{state.curr_str + std::wstring(1, event.symbol)};
 }
 
-State FiniteStateMachine::onEvent(states::Literal state,
-                                            events::DecimalDigit event) {
+State FiniteStateMachine::onEvent(const states::Literal& state,
+                                  const events::DecimalDigit event) {
   return states::Literal{state.curr_str + std::wstring(1, event.symbol)};
 }
 
-State FiniteStateMachine::onEvent(states::Literal state,
-                                          Event event) {
+State FiniteStateMachine::onEvent(const states::Literal& state,
+                                  [[maybe_unused]] Event event) {
   applyState(state);
   stop_in_symbol_ = true;
   return states::Begin{};
 }
 
 // RTI
-State FiniteStateMachine::onEvent(states::RTI state,
-                                          events::Dot event) {
+State FiniteStateMachine::onEvent(const states::RTI& state,
+                                  const events::Dot event) {
   return states::RTI{state.curr_str + std::wstring(1, event.symbol)};
 }
 
-State FiniteStateMachine::onEvent(states::RTI state,
-                                            events::Letter event) {
+State FiniteStateMachine::onEvent(const states::RTI& state,
+                                  const events::Letter event) {
   return states::RTI{state.curr_str + std::wstring(1, event.symbol)};
 }
 
-State FiniteStateMachine::onEvent(states::RTI state,
-                                            events::AllBasesDigit event) {
+State FiniteStateMachine::onEvent(const states::RTI& state,
+                                  const events::AllBasesDigit event) {
   return states::RTI{state.curr_str + std::wstring(1, event.symbol)};
 }
 
-State FiniteStateMachine::onEvent(states::RTI state,
-                                            events::BaseSeparator event) {
+State FiniteStateMachine::onEvent(const states::RTI& state,
+                                  const events::BaseSeparator event) {
   return states::RTI{state.curr_str + std::wstring(1, event.symbol)};
 }
 
-State FiniteStateMachine::onEvent(states::RTI state,
-                                          events::DecimalDigit event) {
+State FiniteStateMachine::onEvent(const states::RTI& state,
+                                  const events::DecimalDigit event) {
   return states::RTI{state.curr_str + std::wstring(1, event.symbol)};
 }
 
-State FiniteStateMachine::onEvent(states::RTI state,
-                                          events::Underline event) {
+State FiniteStateMachine::onEvent(const states::RTI& state,
+                                  const events::Underline event) {
   return states::RTI{state.curr_str + std::wstring(1, event.symbol)};
 }
 
-State FiniteStateMachine::onEvent(states::RTI state,
-                                          Event event) {
+State FiniteStateMachine::onEvent(const states::RTI& state,
+                                  [[maybe_unused]] Event event) {
   applyState(state);
   stop_in_symbol_ = true;
   return states::Begin{};
 }
 
 // Operation
-State FiniteStateMachine::onEvent(states::SpecialSymbols state,
-                                          events::Dot event) {
+State FiniteStateMachine::onEvent(const states::SpecialSymbols& state,
+                                  const events::Dot event) {
   return states::SpecialSymbols(state.curr_str + std::wstring(1, event.symbol));
 }
 
-State FiniteStateMachine::onEvent(states::SpecialSymbols state,
-                                          events::Operation event) {
+State FiniteStateMachine::onEvent(const states::SpecialSymbols& state,
+                                  const events::Operation event) {
   return states::SpecialSymbols(state.curr_str + std::wstring(1, event.symbol));
 }
 
-State FiniteStateMachine::onEvent(states::SpecialSymbols state,
-                                          Event event) {
+State FiniteStateMachine::onEvent(const states::SpecialSymbols& state,
+                                  [[maybe_unused]] Event event) {
   applyState(state);
   stop_in_symbol_ = true;
   return states::Begin{};
 }
 
 // Other
-State FiniteStateMachine::onEvent(states::Other state,
-                                          Event event) {
+State FiniteStateMachine::onEvent(const states::Other& state,
+                                  [[maybe_unused]] Event event) {
   applyState(state);
   return states::Other{};
 }
+
+[[maybe_unused]] State FiniteStateMachine::onEvent(const State& state, Event event) { return {}; };
 
 // Default
 // State FiniteStateMachine::onEvent(State state,

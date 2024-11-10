@@ -17,13 +17,13 @@ class Parser {
         void body_();
         void statement_();
 
-        void switch_() {};
+        // void switch_() {};
         void doWhile_();
-        void for_() {};
+        // void for_() {};
         void while_();
         void if_();
         void return_();
-        void definition_() {};
+        // void definition_() {};
         void expression_();
 
         void expr_();

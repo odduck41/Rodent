@@ -14,7 +14,7 @@ bool Parser::get() {
 }
 
 Parser::Parser(const std::vector<Token>& t, const std::string& filename) {
-    std::wstring tmp(filename.begin(), filename.end());
+    const std::wstring tmp(filename.begin(), filename.end());
     filename_ = tmp;
     program = t;
     program_();
@@ -28,7 +28,7 @@ void Parser::program_() {
 
 void Parser::programThings_() {
     if (now.type == Lexeme::Type) {
-        definition_();
+        // definition_();
     } else if (now.type == Lexeme::Reserved) {
         if (now.content == L"import") {
             import_();
@@ -141,14 +141,14 @@ void Parser::inline_body_() {
 void Parser::statement_() {
     if (now.type == Lexeme::Reserved) {
         if (now.content == L"if") if_();
-        else if (now.content == L"switch") switch_();
+        // else if (now.content == L"switch") switch_();
         else if (now.content == L"while") while_();
         else if (now.content == L"do") doWhile_();
-        else if (now.content == L"for") for_();
+        // else if (now.content == L"for") for_();
         else if (now.content == L"return") return_();
         else throw bad_lexeme(now, filename_);
     } else if (now.type == Lexeme::Type) {
-        definition_();
+        // definition_();
     } else if (now.type != Lexeme::Other) {
         expression_();
     } else throw bad_lexeme(now, filename_);
@@ -383,7 +383,7 @@ void Parser::expr11_() {
 void Parser::expr12_() {
     expr13_();
     while (now.type == Lexeme::Operation) {
-        if (now.content != L"++" || now.content != L"--") return;
+        if (now.content != L"++" && now.content != L"--") return;
         get();
     }
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);

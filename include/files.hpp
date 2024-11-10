@@ -3,7 +3,7 @@
 
 #include <fstream>
 
-class RFile : public std::wifstream {
+class RFile final : public std::wifstream {
   public:
     RFile() = delete;
     explicit RFile(const char*);

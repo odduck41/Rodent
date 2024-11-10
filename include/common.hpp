@@ -27,7 +27,7 @@ static void defineFlags() {
 
 inline void split() {
     std::string res;
-    for (long long i = filename.size() - 1ll; i >= 0; --i) {
+    for (long long i = static_cast<long long>(filename.size()) - 1ll; i >= 0; --i) {
         if (filename[i] == '\\') {
             where = filename.substr(0, i + 1);
             break;
@@ -109,7 +109,7 @@ static void doAll(const std::string& filename = filename) {
   delete[] program;
 }
 
-inline void doFlags(int argc, const char** argv) {
+inline void doFlags(const int argc, const char** argv) {
   defineFlags();
   for (size_t i = 1; i < argc; ++i) {
     if (argv[i][0] == '-') {
