@@ -1,6 +1,6 @@
 # It's a simple programming language✨
 
-It called Rodent, because we(me, @Artem-627 doesn't care) wanted to name it after a squirrel, quoll, etc. But I undecided.
+It called Rodent, because we(me, cause @Artem-627 doesn't care) wanted to name it after a squirrel, quoll, etc. But I undecided.
 
 Example:
 
