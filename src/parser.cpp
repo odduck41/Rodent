@@ -2,18 +2,20 @@
 #include "common.hpp"
 #include "exceptions.hpp"
 #include <cstdlib>
+#include <set>
 
-lexer::Trie imported_;
+std::set<std::wstring> imported_;
 
 bool Parser::get() {
-    static size_t now_ = -1;
     ++now_;
     if (now_ >= program.size()) return false;
     now = program[now_];
     return true;
 }
 
-Parser::Parser(const std::vector<Token>& t) {
+Parser::Parser(const std::vector<Token>& t, const std::string& filename) {
+    std::wstring tmp(filename.begin(), filename.end());
+    filename_ = tmp;
     program = t;
     program_();
 }
@@ -33,18 +35,18 @@ void Parser::programThings_() {
         } else if (now.content == L"func") {
             functionDefinition_();
         } else {
-            throw bad_lexeme(now);
+            throw bad_lexeme(now, filename_);
         }
     } else {
-        throw bad_lexeme(now);
+        throw bad_lexeme(now, filename_);
     }
 }
 
 void Parser::import_() {
     get();
     if (now.type == Lexeme::StringLiteral) {
-        if (imported_.check(now.content.c_str())) return;
-        imported_.add(now.content.c_str());
+        if (imported_.contains(now.content)) return;
+        imported_.insert(now.content);
 
         const size_t len = wcstombs(nullptr, now.content.c_str(), 0) + 1;
         const auto buffer = new char[len];
@@ -55,19 +57,19 @@ void Parser::import_() {
 
         delete[] buffer;
 
-        // doAll(filename);
+        doAll(filename);
 
     } else {
-        throw bad_lexeme(now);
+        throw bad_lexeme(now, filename_);
     }
 }
 
 void Parser::functionDefinition_() {
     get();
-    if (now.type != Lexeme::Identifier) throw bad_lexeme(now);
+    if (now.type != Lexeme::Identifier) throw bad_lexeme(now, filename_);
 
     get();
-    if (now.type != Lexeme::OpenParentheses) throw bad_lexeme(now);
+    if (now.type != Lexeme::OpenParentheses) throw bad_lexeme(now, filename_);
 
     get();
 
@@ -77,13 +79,13 @@ void Parser::functionDefinition_() {
 
 
     get();
-    if (now.type != Lexeme::Operation || now.content != L"->") throw bad_lexeme(now);
+    if (now.type != Lexeme::Operation || now.content != L"->") throw bad_lexeme(now, filename_);
 
     get();
-    if (now.type != Lexeme::Type) throw bad_lexeme(now);
+    if (now.type != Lexeme::Type) throw bad_lexeme(now, filename_);
 
     get();
-    if (now.type != Lexeme::OpenCurly) throw bad_lexeme(now);
+    if (now.type != Lexeme::OpenCurly) throw bad_lexeme(now, filename_);
 
     body_();
 
@@ -91,25 +93,25 @@ void Parser::functionDefinition_() {
 
 void Parser::arguments_() {
     while(now.type != Lexeme::CloseParentheses) {
-        if (now.type != Lexeme::Type) throw bad_lexeme(now);
+        if (now.type != Lexeme::Type) throw bad_lexeme(now, filename_);
         get();
-        if (now.type != Lexeme::Identifier) throw bad_lexeme(now);
+        if (now.type != Lexeme::Identifier) throw bad_lexeme(now, filename_);
         get();
         if (now.type == Lexeme::CloseParentheses) return;
         if (now.type == Lexeme::Punctuation && now.content == L",") {
             get();
             continue;
         }
-        if (now.content != L",") throw bad_lexeme(now);
+        if (now.content != L",") throw bad_lexeme(now, filename_);
         get();
         while(now.type != Lexeme::CloseParentheses) {
-            if (now.type != Lexeme::Type) throw bad_lexeme(now);
+            if (now.type != Lexeme::Type) throw bad_lexeme(now, filename_);
             get();
-            if (now.type != Lexeme::Identifier) throw bad_lexeme(now);
+            if (now.type != Lexeme::Identifier) throw bad_lexeme(now, filename_);
             get();
-            if (now.type != Lexeme::Operation && now.content != L"=") throw bad_lexeme(now);
+            if (now.type != Lexeme::Operation && now.content != L"=") throw bad_lexeme(now, filename_);
             get();
-            if (now.type != Lexeme::Literal && now.type != Lexeme::StringLiteral) throw bad_lexeme(now);
+            if (now.type != Lexeme::Literal && now.type != Lexeme::StringLiteral) throw bad_lexeme(now, filename_);
 
             get();
 
@@ -117,7 +119,7 @@ void Parser::arguments_() {
                 continue;
             }
 
-            throw bad_lexeme(now);
+            throw bad_lexeme(now, filename_);
         }
         break;
     }
@@ -144,12 +146,12 @@ void Parser::statement_() {
         else if (now.content == L"do") doWhile_();
         else if (now.content == L"for") for_();
         else if (now.content == L"return") return_();
-        else throw bad_lexeme(now);
+        else throw bad_lexeme(now, filename_);
     } else if (now.type == Lexeme::Type) {
         definition_();
     } else if (now.type != Lexeme::Other) {
         expression_();
-    } else throw bad_lexeme(now);
+    } else throw bad_lexeme(now, filename_);
 }
 
 // void Parser::switch_() {
@@ -158,48 +160,48 @@ void Parser::statement_() {
 
 void Parser::doWhile_() {
     get();
-    if (now.type != Lexeme::OpenCurly) throw bad_lexeme(now);
+    if (now.type != Lexeme::OpenCurly) throw bad_lexeme(now, filename_);
     inline_body_();
-    if (now.type != Lexeme::Reserved && now.content != L"while") throw bad_lexeme(now);
+    if (now.type != Lexeme::Reserved && now.content != L"while") throw bad_lexeme(now, filename_);
 
     get();
-    if (now.type != Lexeme::OpenParentheses) throw bad_lexeme(now);
+    if (now.type != Lexeme::OpenParentheses) throw bad_lexeme(now, filename_);
 
     get();
     expr_();
 
-    if (now.type != Lexeme::CloseParentheses) throw bad_lexeme(now);
+    if (now.type != Lexeme::CloseParentheses) throw bad_lexeme(now, filename_);
     get();
-    if (now.type != Lexeme::Semicolon) throw bad_lexeme(now);
+    if (now.type != Lexeme::Semicolon) throw bad_lexeme(now, filename_);
     get();
 }
 
 void Parser::while_() {
     get();
-    if (now.type != Lexeme::OpenParentheses) throw bad_lexeme(now);
+    if (now.type != Lexeme::OpenParentheses) throw bad_lexeme(now, filename_);
 
     get();
     expr_();
 
-    if (now.type != Lexeme::CloseParentheses) throw bad_lexeme(now);
+    if (now.type != Lexeme::CloseParentheses) throw bad_lexeme(now, filename_);
 
     get();
-    if (now.type != Lexeme::OpenCurly) throw bad_lexeme(now);
+    if (now.type != Lexeme::OpenCurly) throw bad_lexeme(now, filename_);
 
     inline_body_();
 }
 
 void Parser::if_() {
     get();
-    if (now.type != Lexeme::OpenParentheses) throw bad_lexeme(now);
+    if (now.type != Lexeme::OpenParentheses) throw bad_lexeme(now, filename_);
 
     get();
     expr_();
 
-    if (now.type != Lexeme::CloseParentheses) throw bad_lexeme(now);
+    if (now.type != Lexeme::CloseParentheses) throw bad_lexeme(now, filename_);
 
     get();
-    if (now.type != Lexeme::OpenCurly) throw bad_lexeme(now);
+    if (now.type != Lexeme::OpenCurly) throw bad_lexeme(now, filename_);
 
     inline_body_();
     if (now.type == Lexeme::Reserved && now.content == L"else") {
@@ -208,7 +210,7 @@ void Parser::if_() {
             if_();
             return;
         }
-        if (now.type != Lexeme::OpenCurly) throw bad_lexeme(now);
+        if (now.type != Lexeme::OpenCurly) throw bad_lexeme(now, filename_);
         inline_body_();
         return;
     }
@@ -219,7 +221,6 @@ void Parser::if_() {
 void Parser::return_() {
     get();
     expression_();
-    if (now.type != Lexeme::CloseCurly) throw bad_lexeme(now);
 }
 
 void Parser::expression_() {
@@ -227,7 +228,7 @@ void Parser::expression_() {
 
     expr_();
 
-    if (now.type != Lexeme::Semicolon) throw bad_lexeme(now);
+    if (now.type != Lexeme::Semicolon) throw bad_lexeme(now, filename_);
     get();
 }
 
@@ -243,7 +244,7 @@ void Parser::expr0_() {
         expr1_();
     }
 
-    if (now.type == Lexeme::Other) throw bad_lexeme(now);
+    if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
 }
 
 bool Parser::op1(const std::wstring& s) {
@@ -261,7 +262,7 @@ void Parser::expr1_() {
         expr2_();
     }
 
-    if (now.type == Lexeme::Other) throw bad_lexeme(now);
+    if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
 }
 
 void Parser::expr2_() {
@@ -272,7 +273,7 @@ void Parser::expr2_() {
         expr3_();
     }
 
-    if (now.type == Lexeme::Other) throw bad_lexeme(now);
+    if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
 }
 
 void Parser::expr3_() {
@@ -283,7 +284,7 @@ void Parser::expr3_() {
         expr4_();
     }
 
-    if (now.type == Lexeme::Other) throw bad_lexeme(now);
+    if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
 }
 
 void Parser::expr4_() {
@@ -294,7 +295,7 @@ void Parser::expr4_() {
         expr5_();
     }
 
-    if (now.type == Lexeme::Other) throw bad_lexeme(now);
+    if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
 }
 
 void Parser::expr5_() {
@@ -305,7 +306,7 @@ void Parser::expr5_() {
         expr6_();
     }
 
-    if (now.type == Lexeme::Other) throw bad_lexeme(now);
+    if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
 }
 
 void Parser::expr6_() {
@@ -316,7 +317,7 @@ void Parser::expr6_() {
         expr7_();
     }
 
-    if (now.type == Lexeme::Other) throw bad_lexeme(now);
+    if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
 }
 
 bool Parser::op7(const std::wstring& s) {
@@ -331,7 +332,7 @@ void Parser::expr7_() {
         expr8_();
     }
 
-    if (now.type == Lexeme::Other) throw bad_lexeme(now);
+    if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
 }
 
 void Parser::expr8_() {
@@ -342,7 +343,7 @@ void Parser::expr8_() {
         expr9_();
     }
 
-    if (now.type == Lexeme::Other) throw bad_lexeme(now);
+    if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
 }
 
 void Parser::expr9_() {
@@ -353,7 +354,7 @@ void Parser::expr9_() {
         expr10_();
     }
 
-    if (now.type == Lexeme::Other) throw bad_lexeme(now);
+    if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
 }
 
 void Parser::expr10_() {
@@ -363,7 +364,7 @@ void Parser::expr10_() {
         get();
         expr11_();
     }
-    if (now.type == Lexeme::Other) throw bad_lexeme(now);
+    if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
 }
 
 bool Parser::op11(const std::wstring& s) {
@@ -375,7 +376,7 @@ void Parser::expr11_() {
         if (!op11(now.content)) return;
         get();
     }
-    if (now.type == Lexeme::Other) throw bad_lexeme(now);
+    if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
     expr12_();
 }
 
@@ -385,13 +386,13 @@ void Parser::expr12_() {
         if (now.content != L"++" || now.content != L"--") return;
         get();
     }
-    if (now.type == Lexeme::Other) throw bad_lexeme(now);
+    if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
 }
 
 void Parser::expr13_() {
     atom();
 
-    if (now.type == Lexeme::Other) throw bad_lexeme(now);
+    if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
 
     if (now.content == L".") {
         get();
@@ -403,7 +404,7 @@ void Parser::expr13_() {
     if (now.content != L"[") return;
     expr_();
 
-    if (now.type == Lexeme::Other) throw bad_lexeme(now);
+    if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
 
     if (now.content != L"]") return;
     get();
@@ -412,7 +413,7 @@ void Parser::expr13_() {
 void Parser::atom() {
     if (now.type != Lexeme::Identifier && now.type != Lexeme::Literal && now.type != Lexeme::StringLiteral) {
         if (now.content == L"(") expr0_();
-        if (now.content != L")") throw bad_lexeme(now);
+        if (now.content != L")") throw bad_lexeme(now, filename_);
     }
     if (now.type == Lexeme::Literal || now.type == Lexeme::StringLiteral) {
         get();
@@ -420,7 +421,7 @@ void Parser::atom() {
     }
     get();
     if (now.type == Lexeme::Operation) return;
-    if (now.type == Lexeme::Other) throw bad_lexeme(now);
+    if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
     if (now.type != Lexeme::OpenParentheses) return;
     functionCall_();
     get();
@@ -429,7 +430,7 @@ void Parser::atom() {
 void Parser::functionCall_() {
     get();
     given_();
-    if (now.type != Lexeme::CloseParentheses) throw bad_lexeme(now);
+    if (now.type != Lexeme::CloseParentheses) throw bad_lexeme(now, filename_);
 }
 
 void Parser::given_() {
@@ -439,6 +440,6 @@ void Parser::given_() {
         get();
         expr_();
     }
-    if (now.type == Lexeme::Other) throw bad_lexeme(now);
-    if (now.type != Lexeme::CloseParentheses) throw bad_lexeme(now);
+    if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
+    if (now.type != Lexeme::CloseParentheses) throw bad_lexeme(now, filename_);
 }

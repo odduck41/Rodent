@@ -1,0 +1,3 @@
+func abs() -> int {
+    return 3;
+}

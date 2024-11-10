@@ -24,5 +24,7 @@ func main() -> int  {
 
 func gcd2(int a, int b) -> int {
     return a + b;
-    ++0-=-=-=-=a+=da=d-dpwad+D=wdkapkdpawd
+    a += 34;
+    ++a;
+    ++AS0-=-=-=-=a+=da=d-dpwad+D=wdkapkdpawd;
 }

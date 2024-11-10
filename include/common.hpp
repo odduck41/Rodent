@@ -6,6 +6,7 @@
 #include "FSM.hpp"
 #include "exceptions.hpp"
 #include "files.hpp"
+#include "parser.hpp"
 #include "lexer.hpp"
 // #include "test.h"
 
@@ -13,6 +14,7 @@ template <class... T>
 std::map<wchar_t, void (*)(T...)> function;
 
 inline std::string filename;
+inline std::string where;
 inline std::string out;
 
 inline void lex(const char* output = "a.dev") {
@@ -23,11 +25,26 @@ static void defineFlags() {
   function<const char*>['l'] = &lex;
 }
 
+inline void split() {
+    std::string res;
+    for (long long i = filename.size() - 1ll; i >= 0; --i) {
+        if (filename[i] == '\\') {
+            where = filename.substr(0, i + 1);
+            break;
+        }
+        std::string nw;
+        nw += filename[i];
+        res = (nw += res);
+    }
+    filename = res;
+
+}
+
 static void doAll(const std::string& filename = filename) {
     // loadReserved();
     // loadTypes();
 
-  RFile file(filename.c_str());
+  RFile file((where + filename).c_str());
   const long long size_ = file.size();
 
   auto program = new wchar_t[size_ + 1];
@@ -41,50 +58,53 @@ static void doAll(const std::string& filename = filename) {
   lexer::FiniteStateMachine fsm(program, size_);
   std::vector<Token> tokens = fsm.getTokens();
 
-  for (Token token : tokens) {
-    std::cout << token.line << ": ";
-    std::wcout << token.content;
-    std::cout << " | ";
-    if (token.type == Lexeme::Reserved) {
-      std::cout << "Reserved" << '\n';
-    }
-    if (token.type == Lexeme::Identifier) {
-      std::cout << "Identifier" << '\n';
-    }
-    if (token.type == Lexeme::Type) {
-      std::cout << "Type" << '\n';
-    }
-    if (token.type == Lexeme::Literal) {
-      std::cout << "Literal" << '\n';
-    }
-    if (token.type == Lexeme::StringLiteral) {
-      std::cout << "StringLiteral" << '\n';
-    }
-    if (token.type == Lexeme::Operation) {
-      std::cout << "Operation" << '\n';
-    }
-    if (token.type == Lexeme::Punctuation) {
-      std::cout << "Punctuation" << '\n';
-    }
-    if (token.type == Lexeme::Semicolon) {
-      std::cout << "Semicolon" << '\n';
-    }
-    if (token.type == Lexeme::OpenParentheses) {
-      std::cout << "OpenParentheses" << '\n';
-    }
-    if (token.type == Lexeme::CloseParentheses) {
-      std::cout << "CloseParentheses" << '\n';
-    }
-    if (token.type == Lexeme::OpenCurly) {
-      std::cout << "OpenCurly" << '\n';
-    }
-    if (token.type == Lexeme::CloseCurly) {
-      std::cout << "CloseCurly" << '\n';
-    }
-    if (token.type == Lexeme::Other) {
-      std::cout << "Other" << '\n';
-    }
-  }
+  Parser p(tokens, filename);
+
+  // for (Token token : tokens) {
+  //   std::cout << token.line << ": ";
+  //   std::wcout << token.content;
+  //   std::cout << " | ";
+  //   if (token.type == Lexeme::Reserved) {
+  //     std::cout << "Reserved" << '\n';
+  //   }
+  //   if (token.type == Lexeme::Identifier) {
+  //     std::cout << "Identifier" << '\n';
+  //   }
+  //   if (token.type == Lexeme::Type) {
+  //     std::cout << "Type" << '\n';
+  //   }
+  //   if (token.type == Lexeme::Literal) {
+  //     std::cout << "Literal" << '\n';
+  //   }
+  //   if (token.type == Lexeme::StringLiteral) {
+  //     std::cout << "StringLiteral" << '\n';
+  //   }
+  //   if (token.type == Lexeme::Operation) {
+  //     std::cout << "Operation" << '\n';
+  //   }
+  //   if (token.type == Lexeme::Punctuation) {
+  //     std::cout << "Punctuation" << '\n';
+  //   }
+  //   if (token.type == Lexeme::Semicolon) {
+  //     std::cout << "Semicolon" << '\n';
+  //   }
+  //   if (token.type == Lexeme::OpenParentheses) {
+  //     std::cout << "OpenParentheses" << '\n';
+  //   }
+  //   if (token.type == Lexeme::CloseParentheses) {
+  //     std::cout << "CloseParentheses" << '\n';
+  //   }
+  //   if (token.type == Lexeme::OpenCurly) {
+  //     std::cout << "OpenCurly" << '\n';
+  //   }
+  //   if (token.type == Lexeme::CloseCurly) {
+  //     std::cout << "CloseCurly" << '\n';
+  //   }
+  //   if (token.type == Lexeme::Other) {
+  //     std::cout << "Other" << '\n';
+  //   }
+  // }
+
 
   delete[] program;
 }
@@ -110,6 +130,6 @@ inline void doFlags(int argc, const char** argv) {
 
   next:;
   }
-
+  split();
   doAll();
 }

@@ -206,7 +206,7 @@ bool Trie::check_(const wchar_t* s, const Trie::Node* trie, const size_t sz) {
     return false;
   }
 
-  if (trie->children[s[sz] - 'a'] == nullptr)
+  if (s[sz] - 'a' < 0 || trie->children[s[sz] - 'a'] == nullptr)
     return false;
   return check_(s, trie->children[s[sz] - 'a'], sz + 1);
 }
@@ -221,7 +221,7 @@ bool Trie::check_(const std::wstring& s,
     return false;
   }
 
-  if (trie->children[s[sz] - 'a'] == nullptr)
+  if (s[sz] - 'a' < 0 || trie->children[s[sz] - 'a'] == nullptr)
     return false;
   return check_(s, trie->children[s[sz] - 'a'], sz + 1);
 }

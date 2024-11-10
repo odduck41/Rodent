@@ -2,12 +2,11 @@
 
 #include "lexer.hpp"
 
-extern lexer::Trie imported_;
-
 class Parser {
     public:
-        explicit Parser(const std::vector<Token>&);
+        Parser(const std::vector<Token>&, const std::string&);
     private:
+        std::wstring filename_;
         void program_();
 
         void programThings_();
@@ -55,6 +54,8 @@ class Parser {
 
 
         bool get();
+        size_t now_ = -1;
+
         std::vector<Token> program;
         Token now;
 
