@@ -1,6 +1,7 @@
 #include "common.hpp"
 #include "parser.hpp"
 #include "Test.h"
+#include <iostream>
 
 // Лол, если basic.hpp - первый include, то оно нахуй падает, хотя везде есть #pragma once...
 #include "basic.hpp"
@@ -23,6 +24,6 @@ int main(int argc, const char** argv) {
   }
   // HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
   // SetConsoleTextAttribute(hConsole, 10);
-  std::cout << "OK";
+  printf("OK");
   return 0;
 }

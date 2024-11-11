@@ -44,7 +44,19 @@ void FiniteStateMachine::applyState(const states::SpecialSymbols &state) {
       operations(state.curr_str);
     }
   } else {
-    operations(state.curr_str);
+    std::wstring curr_ctr;
+    for (const wchar_t& symbol : state.curr_str) {
+      if (symbol == ';') {
+        operations(curr_ctr);
+        curr_ctr = L"";
+        tokens_.push_back({Lexeme::Semicolon, L";", curr_line_});
+      } else {
+        curr_ctr += symbol;
+      }
+    }
+    if (!curr_ctr.empty()) {
+      operations(state.curr_str);
+    }
   }
 }
 
