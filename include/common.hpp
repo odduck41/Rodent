@@ -44,7 +44,7 @@ inline void l(const std::vector<Token>& tokens) {
     WFile os(out.c_str());
     os << L"{\n";
     for (size_t i = 0; i < tokens.size(); ++i) {
-      os << L"Token{" << asWstring(tokens[i].type) << L", \"" << tokens[i].content << L"\", " << tokens[i].line << L"}";
+      os << L"\tToken{" << asWstring(tokens[i].type) << L", \"" << tokens[i].content << L"\", " << tokens[i].line << L"}";
       if (i != tokens.size() - 1) {
           os << L",";
       }
