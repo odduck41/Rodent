@@ -1,6 +1,6 @@
 func op() -> int {
-    int a = 0xAB3;
+    // int a = 0xAB3;
     e3423;
-    f 2e3423;
-    ++AS0++0-=-=-=-=a+=da=d-dpwad+D=wdkapkdpawd;
+    // f 2e3423;
+    ++AS0++-=-=-=-=a0+=da=d-dpwad+D=wdkapkdpawd;
 }

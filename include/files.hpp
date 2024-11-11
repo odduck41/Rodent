@@ -9,3 +9,10 @@ class RFile final : public std::wifstream {
     explicit RFile(const char*);
     long long size();
 };
+
+
+class WFile final : public std::wofstream {
+public:
+    WFile() = delete;
+    explicit WFile(const char*);
+};

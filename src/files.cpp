@@ -11,3 +11,5 @@ long long RFile::size() {
 
     return size_;
 }
+
+WFile::WFile(const char* filename) : std::wofstream(filename, std::ifstream::binary) {}
