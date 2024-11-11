@@ -1,31 +1,6 @@
-import "abc.rod"
-
-func gcd(int a, int b) -> int {
-    while (a && b) {
-        do {} while(0);
-        if (a > b) {
-            a &= 4;
-            a %= b;
-        } else {
-            b = a;
-            c == a;
-        }
-    }
-    return 34;
-}
-
-func main() -> int  {
-    gcd(a, b);
-    gcd2(2, b);
-    do {
-        a += 1;
-    } while (a == 1);
-}
-
-func gcd2(int a, int b) -> int {
-    return a + b;
-    a += 34;
-    ++a;
-    a++;
-    ++AS0-=-=-=-=a+=da=d-dpwad+D=wdkapkdpawd;
+func op() -> int {
+    int a = 0xAB3;
+    e3423;
+    f 2e3423;
+    ++AS0++0-=-=-=-=a+=da=d-dpwad+D=wdkapkdpawd;
 }

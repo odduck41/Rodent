@@ -71,24 +71,55 @@ void FiniteStateMachine::applyState(const states::RTI& state) {
 }
 
 void FiniteStateMachine::applyState(const states::Literal &state) {
-  enum NumberBases { Binary, Decimal, Hexadecimal } curr_number_base;
+  enum NumberBases { Binary, Decimal, Hexadecimal, Other } curr_number_base;
   std::wstring curr_number_wstring;
   if (state.curr_str.length() >= 3) {
     if (state.curr_str[1] == 'b') {
+      for (int i = 2; i < state.curr_str.length(); ++i) {
+        if (state.curr_str[i] != '0' && state.curr_str[i] != '1') {
+          curr_number_base = NumberBases::Other;
+          goto skip_bases_check;
+        }
+      }
       curr_number_base = NumberBases::Binary;
     } else if (state.curr_str[1] == 'x') {
+      for (int i = 2; i < state.curr_str.length(); ++i) {
+        if (!(state.curr_str[i] >= '0' && state.curr_str[i] <= '9') &&
+            !(state.curr_str[i] >= 'a' && state.curr_str[i] <= 'f') &&
+            !(state.curr_str[i] >= 'A' && state.curr_str[i] <= 'F')) {
+          curr_number_base = NumberBases::Other;
+          goto skip_bases_check;
+        }
+      }
       curr_number_base = NumberBases::Hexadecimal;
     } else {
+      for (int i = 0; i < state.curr_str.length(); ++i) {
+        if ((state.curr_str[i] < '0' || state.curr_str[i] > '9')) {
+          curr_number_base = NumberBases::Other;
+          goto skip_bases_check;
+        }
+      }
       curr_number_base = NumberBases::Decimal;
     }
   } else {
+    for (int i = 0; i < state.curr_str.length(); ++i) {
+      if ((state.curr_str[i] < '0' || state.curr_str[i] > '9')) {
+        curr_number_base = NumberBases::Other;
+        goto skip_bases_check;
+      }
+    }
     curr_number_base = NumberBases::Decimal;
   }
+  skip_bases_check:
 
-  if (curr_number_base == Decimal) {
+  if (curr_number_base == Other) {
+    curr_number_wstring = state.curr_str;
+    tokens_.push_back({Lexeme::Other, curr_number_wstring, curr_line_});
+    return;
+  } else if (curr_number_base == Decimal) {
     const uint64_t number = stoi(state.curr_str);
     char curr_number_char_arr[17];
-    sprintf(curr_number_char_arr, "%016llu", number);
+    sprintf(curr_number_char_arr, "%llu", number);
     const std::string curr_number_string_arr(curr_number_char_arr);
 
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
