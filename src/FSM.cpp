@@ -284,6 +284,9 @@ void FiniteStateMachine::startProcessText() {
       ++curr_symbol;
     }
   }
+  if (std::holds_alternative<states::SpecialSymbols>(curr_state))  {
+    applyState(std::get<states::SpecialSymbols>(curr_state));
+  }
 }
 
 // Begin
