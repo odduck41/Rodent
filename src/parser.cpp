@@ -186,7 +186,11 @@ void Parser::for_() {
 
     get();
     if (now.type != Lexeme::Semicolon) {
-        expr_();
+        if (now.type == Lexeme::Type) {
+            definition_();
+        } else {
+            expr_();
+        }
         if (now.type != Lexeme::Semicolon) throw bad_lexeme(now, filename_);
     }
 

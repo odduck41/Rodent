@@ -8,9 +8,9 @@
 // #include "FSM.hpp"
 // #include <exceptions.hpp>
 
-#ifdef WIN
+#ifdef _WIN32
 #include <windows.h>
-#endif // WIN
+#endif // _WIN32
 
 int main(int argc, const char** argv) {
   // Trie();
@@ -26,12 +26,12 @@ int main(int argc, const char** argv) {
     std::wcerr << err.what(0);
     return -1;
   }
-#ifdef WIN
+#ifdef _WIN32
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     SetConsoleTextAttribute(hConsole, 10);
 #else
     std::cout << "\e[32m";
-#endif // WIN
+#endif // _WIN32
     std::cout << "OK";
   return 0;
 }

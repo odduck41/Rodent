@@ -4,11 +4,12 @@ func op() -> int {
     // f 2e3423;
     // 40;
     int a;
-    int a = 0x1;
+    int a = 1.2;
     int a = 0x11 + c;
     int a = 0x11 + a, b = 0x1;
     int a = 0x11 + c, c, b = 0x1;
-    for (a;a + 0x1; a - 0x1) {
+    for (int i = 3; i <= 120; ++i) {
         a += 0x3;
     }
+
 }
