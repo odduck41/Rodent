@@ -94,7 +94,7 @@ void FiniteStateMachine::applyState(const states::Literal &state) {
       curr_number_base = NumberBases::Hexadecimal;
     } else {
       for (int i = 0; i < state.curr_str.length(); ++i) {
-        if ((state.curr_str[i] < '0' || state.curr_str[i] > '9')) {
+        if ((state.curr_str[i] < '0' || state.curr_str[i] > '9') && state.curr_str[i] != '.') {
           curr_number_base = NumberBases::Other;
           goto skip_bases_check;
         }
@@ -103,7 +103,7 @@ void FiniteStateMachine::applyState(const states::Literal &state) {
     }
   } else {
     for (int i = 0; i < state.curr_str.length(); ++i) {
-      if ((state.curr_str[i] < '0' || state.curr_str[i] > '9')) {
+      if ((state.curr_str[i] < '0' || state.curr_str[i] > '9') || state.curr_str[i] != '.') {
         curr_number_base = NumberBases::Other;
         goto skip_bases_check;
       }
