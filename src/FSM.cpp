@@ -50,6 +50,10 @@ void FiniteStateMachine::applyState(const states::SpecialSymbols &state) {
         operations(curr_ctr);
         curr_ctr = L"";
         tokens_.push_back({Lexeme::Semicolon, L";", curr_line_});
+      } else if (symbol == ',') {
+        operations(curr_ctr);
+        curr_ctr = L"";
+        tokens_.push_back({Lexeme::Punctuation, L",", curr_line_});
       } else {
         curr_ctr += symbol;
       }
