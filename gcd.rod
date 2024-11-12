@@ -42,7 +42,7 @@ func main() -> int {
     }
 
     // Пример switch
-    switch (num1;) {
+    switch (num1) {
         case 10:
             print("num1 is 10");
             break;

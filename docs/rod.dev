@@ -169,7 +169,6 @@
 	Token{Reserved, "switch", 45},
 	Token{OpenParentheses, "(", 45},
 	Token{Identifier, "num1", 45},
-	Token{Semicolon, ";", 45},
 	Token{CloseParentheses, ")", 45},
 	Token{OpenCurly, "{", 45},
 	Token{Reserved, "case", 46},

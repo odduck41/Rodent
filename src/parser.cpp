@@ -553,6 +553,7 @@ void Parser::expr13_() {
     }
 
     if (now.content != L"[") return;
+    get();
     expr_();
 
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
