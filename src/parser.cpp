@@ -139,12 +139,16 @@ void Parser::inline_body_() {
 }
 
 void Parser::statement_() {
+    if (now.type == Lexeme::Semicolon) {
+        get();
+        return;
+    }
     if (now.type == Lexeme::Reserved) {
         if (now.content == L"if") if_();
         // else if (now.content == L"switch") switch_();
         else if (now.content == L"while") while_();
         else if (now.content == L"do") doWhile_();
-        // else if (now.content == L"for") for_();
+        else if (now.content == L"for") for_();
         else if (now.content == L"return") return_();
         else throw bad_lexeme(now, filename_);
     } else if (now.type == Lexeme::Type) {
@@ -174,6 +178,36 @@ void Parser::doWhile_() {
     get();
     if (now.type != Lexeme::Semicolon) throw bad_lexeme(now, filename_);
     get();
+}
+
+void Parser::for_() {
+    get();
+    if (now.type != Lexeme::OpenParentheses) throw bad_lexeme(now, filename_);
+
+    get();
+    if (now.type != Lexeme::Semicolon) {
+        expr_();
+        if (now.type != Lexeme::Semicolon) throw bad_lexeme(now, filename_);
+    }
+
+    get();
+    if (now.type != Lexeme::Semicolon) {
+        expr_();
+        if (now.type != Lexeme::Semicolon) throw bad_lexeme(now, filename_);
+    }
+
+
+
+    get();
+    if (now.type != Lexeme::CloseParentheses) {
+        expr_();
+        if (now.type != Lexeme::CloseParentheses) throw bad_lexeme(now, filename_);
+    }
+
+    get();
+    if (now.type != Lexeme::OpenCurly) throw bad_lexeme(now, filename_);
+
+    inline_body_();
 }
 
 void Parser::while_() {

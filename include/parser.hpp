@@ -19,7 +19,7 @@ class Parser {
 
         // void switch_() {};
         void doWhile_();
-        // void for_() {};
+        void for_();
         void while_();
         void if_();
         void return_();
