@@ -23,7 +23,7 @@ class Parser {
         void while_();
         void if_();
         void return_();
-        // void definition_() {};
+        void definition_();
         void expression_();
 
         void expr_();

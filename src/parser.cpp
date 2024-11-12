@@ -28,7 +28,7 @@ void Parser::program_() {
 
 void Parser::programThings_() {
     if (now.type == Lexeme::Type) {
-        // definition_();
+        definition_();
     } else if (now.type == Lexeme::Reserved) {
         if (now.content == L"import") {
             import_();
@@ -152,7 +152,7 @@ void Parser::statement_() {
         else if (now.content == L"return") return_();
         else throw bad_lexeme(now, filename_);
     } else if (now.type == Lexeme::Type) {
-        // definition_();
+        definition_();
     } else if (now.type != Lexeme::Other) {
         expression_();
     } else throw bad_lexeme(now, filename_);
@@ -195,8 +195,6 @@ void Parser::for_() {
         expr_();
         if (now.type != Lexeme::Semicolon) throw bad_lexeme(now, filename_);
     }
-
-
 
     get();
     if (now.type != Lexeme::CloseParentheses) {
@@ -255,6 +253,31 @@ void Parser::if_() {
 void Parser::return_() {
     get();
     expression_();
+}
+
+void Parser::definition_() {
+    get();
+    while (now.type != Lexeme::Semicolon) {
+        if (now.type != Lexeme::Identifier) throw bad_lexeme(now, filename_);
+        get();
+        if (now.type != Lexeme::Punctuation
+            && now.type != Lexeme::Operation
+            && now.type != Lexeme::Semicolon) throw bad_lexeme(now, filename_);
+        if (now.type == Lexeme::Semicolon) return;
+        if (now.type == Lexeme::Punctuation) {
+            if (now.content != L",") throw bad_lexeme(now, filename_);
+            get();
+            continue;
+        }
+        if (now.type == Lexeme::Operation && now.content != L"=") throw bad_lexeme(now, filename_);
+        get();
+        expr_();
+        if (now.type == Lexeme::Semicolon) return;
+        if (now.type == Lexeme::Punctuation) {
+            if (now.content != L",") throw bad_lexeme(now, filename_);
+            get();
+        }
+    }
 }
 
 void Parser::expression_() {

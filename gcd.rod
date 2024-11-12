@@ -3,6 +3,11 @@ func op() -> int {
     // e3423;
     // f 2e3423;
     // 40;
+    int a;
+    int a = 0x1;
+    int a = 0x11 + c;
+    int a = 0x11 + a, b = 0x1;
+    int a = 0x11 + c, c, b = 0x1;
     for (a;a + 0x1; a - 0x1) {
         a += 0x3;
     }
