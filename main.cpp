@@ -8,6 +8,10 @@
 // #include "FSM.hpp"
 // #include <exceptions.hpp>
 
+#ifdef WIN
+#include <windows.h>
+#endif // WIN
+
 int main(int argc, const char** argv) {
   // Trie();
   // operations();
@@ -19,12 +23,15 @@ int main(int argc, const char** argv) {
   try {
     doFlags(argc, argv);
   } catch (bad_lexeme& err) {
-    // std::wcerr << err.what(0);
-    printf("%ls", err.what(0));
+    std::wcerr << err.what(0);
     return -1;
   }
-  // HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-  // SetConsoleTextAttribute(hConsole, 10);
-  printf("OK");
+#ifdef WIN
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleTextAttribute(hConsole, 10);
+#else
+    std::cout << "\e[32m";
+#endif // WIN
+    std::cout << "OK";
   return 0;
 }

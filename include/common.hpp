@@ -71,11 +71,11 @@ static void doAll(const std::string& filename = filename) {
   lexer::FiniteStateMachine fsm(program, size_);
   std::vector<Token> tokens = fsm.getTokens();
 
-  Parser p(tokens, filename);
-
   if (!out.empty()) {
-      l(tokens);
+    l(tokens);
   }
+
+  Parser p(tokens, filename);
 
   delete[] program;
 }
