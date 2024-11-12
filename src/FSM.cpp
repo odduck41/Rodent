@@ -71,7 +71,7 @@ void FiniteStateMachine::applyState(const states::RTI& state) {
 }
 
 void FiniteStateMachine::applyState(const states::Literal &state) {
-  enum NumberBases { Binary, Decimal, Hexadecimal, Other } curr_number_base;
+  enum NumberBases { Binary, Decimal, DecimalFloat, Hexadecimal, Other } curr_number_base;
   std::wstring curr_number_wstring;
   if (state.curr_str.length() >= 3) {
     if (state.curr_str[1] == 'b') {
@@ -99,12 +99,24 @@ void FiniteStateMachine::applyState(const states::Literal &state) {
           goto skip_bases_check;
         }
       }
+      for (int i = 0; i < state.curr_str.length(); ++i) {
+        if (state.curr_str[i] == '.') {
+          curr_number_base = NumberBases::DecimalFloat;
+          goto skip_bases_check;
+        }
+      }
       curr_number_base = NumberBases::Decimal;
     }
   } else {
     for (int i = 0; i < state.curr_str.length(); ++i) {
-      if ((state.curr_str[i] < '0' || state.curr_str[i] > '9') || state.curr_str[i] != '.') {
+      if ((state.curr_str[i] < '0' || state.curr_str[i] > '9') && state.curr_str[i] != '.') {
         curr_number_base = NumberBases::Other;
+        goto skip_bases_check;
+      }
+    }
+    for (int i = 0; i < state.curr_str.length(); ++i) {
+      if (state.curr_str[i] == '.') {
+        curr_number_base = NumberBases::DecimalFloat;
         goto skip_bases_check;
       }
     }
@@ -119,15 +131,39 @@ void FiniteStateMachine::applyState(const states::Literal &state) {
   } else if (curr_number_base == Decimal) {
     const uint64_t number = stoi(state.curr_str);
     char curr_number_char_arr[17];
-    sprintf(curr_number_char_arr, "%llu", number);
+    for (char& i : curr_number_char_arr) {
+      i = 0;
+    }
+    sprintf(curr_number_char_arr, "%llX", number);
+    const std::string curr_number_string_arr(curr_number_char_arr);
+
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+    curr_number_wstring = converter.from_bytes(curr_number_string_arr);
+  } else if (curr_number_base == DecimalFloat) {
+    const double number_double = stod(state.curr_str);
+    const auto number = std::bit_cast<const uint64_t>(number_double);
+    char curr_number_char_arr[17];
+    for (char& i : curr_number_char_arr) {
+      i = 0;
+    }
+    sprintf(curr_number_char_arr, "%llX", number);
     const std::string curr_number_string_arr(curr_number_char_arr);
 
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
     curr_number_wstring = converter.from_bytes(curr_number_string_arr);
   } else if (curr_number_base == Binary) {
-    const uint64_t number = stoi(state.curr_str.substr(2));
+    const std::wstring number_str = state.curr_str.substr(2);
+    uint64_t number = 0;
+    for (int i = 0; i < number_str.length(); ++i) {
+      if (number_str[number_str.length() - i - 1] == L'1') {
+        number += (1 << i);
+      }
+    }
     char curr_number_char_arr[17];
-    sprintf(curr_number_char_arr, "%016llu", number);
+    for (char& i : curr_number_char_arr) {
+      i = 0;
+    }
+    sprintf(curr_number_char_arr, "%llX", number);
     const std::string curr_number_string_arr(curr_number_char_arr);
 
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
