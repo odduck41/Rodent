@@ -1,6 +1,61 @@
-func op() -> int {
-    // int a = 0xAB3;
-    e3423;
-    // f 2e3423;
-    40;
+// Объявляем функцию с двумя параметрами, возвращающую int
+func calculate(int a, int b) -> int {
+    int result = 0;
+
+    // Пример использования if, elif и else if
+    if (a > b) {
+        result = a - b;
+    } elif (a == b) {
+        result = 0;
+    } else if (a < b) {
+        result = b - a;
+    } else {
+        result = -1;
+    }
+
+    return result;
+}
+
+// Главная функция
+func main() -> int {
+    int num1 = 10;
+    int num2 = 20;
+    bool isValid = true;
+
+    // Пример цикла for
+    for (int i = 0; i < 5; i = i + 1) {
+        if (isValid) {
+            // Используем continue для пропуска итерации
+            continue;
+        }
+    }
+
+    // Пример массива
+    array arr = [1, 2, 3, 4, 5];
+    int sum = 0;
+
+    // Пример цикла while
+    int i = 0;
+    while (i < arr.length) {
+        sum = sum + arr[i];
+        i = i + 1;
+    }
+
+    // Пример switch
+    switch (num1) {
+        case 10:
+            print("num1 is 10");
+            break;
+        case 20:
+            print("num1 is 20");
+            break;
+        default:
+            print("num1 is something else");
+    }
+
+    // Вызов функции calculate и вывод результата
+    int result = calculate(num1, num2);
+    print("Result:", result);
+
+    return 0;
 }

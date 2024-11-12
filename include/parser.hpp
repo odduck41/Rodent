@@ -17,13 +17,17 @@ class Parser {
         void body_();
         void statement_();
 
-        // void switch_() {};
+        void switch_();
+        void case_();
+        void case_body_();
+        void default_();
         void doWhile_();
-        // void for_() {};
+        void for_();
         void while_();
         void if_();
         void return_();
-        // void definition_() {};
+        void definition_();
+        void array_definition_();
         void expression_();
 
         void expr_();
@@ -53,7 +57,8 @@ class Parser {
 
 
 
-        bool get();
+        bool get_();
+        void get();
         size_t now_ = -1;
 
         std::vector<Token> program;
