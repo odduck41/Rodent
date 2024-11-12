@@ -120,7 +120,7 @@ void Parser::arguments_() {
 
             get();
 
-            if (now.type == Lexeme::Punctuation && now.content == L",") {
+            if (now.content == L",") {
                 continue;
             }
 
@@ -351,7 +351,7 @@ void Parser::array_definition_() {
     if (now.type != Lexeme::Identifier) throw bad_lexeme(now, filename_);
 
     get();
-    if (now.type == Lexeme::Punctuation && now.content == L",") {
+    if (now.content == L",") {
         array_definition_();
         return;
     }
