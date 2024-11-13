@@ -326,10 +326,9 @@ void Parser::definition_() {
 
 void Parser::array_definition_() {
     get();
-    if (now.type == Lexeme::Semicolon) return;
     if (now.type != Lexeme::Identifier) throw bad_lexeme(now, filename_);
-
     get();
+    if (now.type == Lexeme::Semicolon) return;
     if (now.content == L",") {
         array_definition_();
         return;
