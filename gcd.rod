@@ -1,8 +1,7 @@
-// Объявляем функцию с двумя параметрами, возвращающую int
 func calculate(int a, int b) -> int {
+    int 変数;
     int result = 0;
 
-    // Пример использования if, elif и else if
     if (a > b) {
         result = a - b;
     } elif (a == b) {
@@ -16,32 +15,28 @@ func calculate(int a, int b) -> int {
     return result;
 }
 
-// Главная функция
+int a, b = 3, c, d = 0x1;
+
 func main() -> int {
     int num1 = 10;
     int num2 = 20;
     bool isValid = true;
 
-    // Пример цикла for
     for (int i = 0; i < 5; i = i + 1) {
         if (isValid) {
-            // Используем continue для пропуска итерации
             continue;
         }
     }
 
-    // Пример массива
     array arr = [1, 2, 3, 4, 5];
     int sum = 0;
 
-    // Пример цикла while
     int i = 0;
     while (i < arr.length) {
         sum = sum + arr[i];
         i = i + 1;
     }
 
-    // Пример switch
     switch (num1) {
         case 10:
             print("num1 is 10");
@@ -53,7 +48,6 @@ func main() -> int {
             print("num1 is something else");
     }
 
-    // Вызов функции calculate и вывод результата
     int result = calculate(num1, num2);
     print("Result:", result);
 

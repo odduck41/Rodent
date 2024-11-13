@@ -1,6 +1,10 @@
 #include "files.hpp"
+#include <locale>
+#include <codecvt>
 
-RFile::RFile(const char* filename) : std::wifstream(filename, std::ifstream::binary) {}
+RFile::RFile(const char* filename) : std::wifstream(filename, std::ifstream::binary) {
+    this->imbue(std::locale(this->getloc(), new std::codecvt_utf8<wchar_t>));
+}
 
 long long RFile::size() {
     if (!this->is_open()) return 0;
@@ -12,4 +16,6 @@ long long RFile::size() {
     return size_;
 }
 
-WFile::WFile(const char* filename) : std::wofstream(filename, std::ifstream::binary) {}
+WFile::WFile(const char* filename) : std::wofstream(filename, std::ifstream::binary) {
+    this->imbue(std::locale(this->getloc(), new std::codecvt_utf8<wchar_t>));
+}
