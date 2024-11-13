@@ -97,37 +97,16 @@ void Parser::functionDefinition_() {
 }
 
 void Parser::arguments_() {
-    while(now.type != Lexeme::CloseParentheses) {
-        if (now.type != Lexeme::Type) throw bad_lexeme(now, filename_);
+    if (now.type != Lexeme::Type) throw bad_lexeme(now, filename_);
+    get();
+    if (now.type != Lexeme::Identifier) throw bad_lexeme(now, filename_);
+    get();
+    if (now.content == L",") {
         get();
-        if (now.type != Lexeme::Identifier) throw bad_lexeme(now, filename_);
-        get();
-        if (now.type == Lexeme::CloseParentheses) return;
-        if (now.type == Lexeme::Punctuation && now.content == L",") {
-            get();
-            continue;
-        }
-        if (now.content != L",") throw bad_lexeme(now, filename_);
-        get();
-        while(now.type != Lexeme::CloseParentheses) {
-            if (now.type != Lexeme::Type) throw bad_lexeme(now, filename_);
-            get();
-            if (now.type != Lexeme::Identifier) throw bad_lexeme(now, filename_);
-            get();
-            if (now.type != Lexeme::Operation && now.content != L"=") throw bad_lexeme(now, filename_);
-            get();
-            if (now.type != Lexeme::Literal && now.type != Lexeme::StringLiteral) throw bad_lexeme(now, filename_);
-
-            get();
-
-            if (now.content == L",") {
-                continue;
-            }
-
-            throw bad_lexeme(now, filename_);
-        }
-        break;
+        arguments_();
     }
+    if (now.type == Lexeme::CloseParentheses) return;
+    throw bad_lexeme(now, filename_);
 }
 
 void Parser::body_() {

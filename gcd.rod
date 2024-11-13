@@ -1,55 +1,7 @@
-func calculate(int a, int b) -> int {
-    int 変数;
-    int result = 0;
 
-    if (a > b) {
-        result = a - b;
-    } elif (a == b) {
-        result = 0;
-    } else if (a < b) {
-        result = b - a;
-    } else {
-        result = -1;
-    }
+array arr = [123];
 
-    return result;
-}
-
-int a, b = 3, c, d = 0x1;
-
-func main() -> int {
-    int num1 = 10;
-    int num2 = 20;
-    bool isValid = true;
-
-    for (int i = 0; i < 5; i = i + 1) {
-        if (isValid) {
-            continue;
-        }
-    }
-
-    array arr = [1, 2, 3, 4, 5];
-    int sum = 0;
-
-    int i = 0;
-    while (i < arr.length) {
-        sum = sum + arr[i];
-        i = i + 1;
-    }
-
-    switch (num1) {
-        case 10:
-            print("num1 is 10");
-            break;
-        case 20:
-            print("num1 is 20");
-            break;
-        default:
-            print("num1 is something else");
-    }
-
-    int result = calculate(num1, num2);
-    print("Result:", result);
-
+func main(int h, int m, str a) -> int {
+    array e = [1, 2, 3];
     return 0;
 }
