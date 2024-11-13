@@ -542,7 +542,7 @@ void Parser::expr13_() {
 
 void Parser::atom() {
     if (now.type != Lexeme::Identifier && now.type != Lexeme::Literal && now.type != Lexeme::StringLiteral) {
-        if (now.content == L"(") expr0_();
+        if (now.content == L"(") {get(); expr0_();}
         if (now.content != L")") throw bad_lexeme(now, filename_);
     }
     if (now.type == Lexeme::Literal || now.type == Lexeme::StringLiteral) {
