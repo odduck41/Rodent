@@ -367,7 +367,7 @@ void Parser::expr_() {
 
 void Parser::expr0_() {
     expr1_();
-    while (now.type == Lexeme::Operation) {
+    while (now.type == Lexeme::Punctuation) {
         if (now.content != L",") return;
         get();
         expr1_();

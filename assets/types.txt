@@ -1,1 +1,1 @@
-int double char bool str array
+void int double char bool str array
