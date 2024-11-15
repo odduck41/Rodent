@@ -146,6 +146,10 @@ void Parser::statement_() {
     } else throw bad_lexeme(now, filename_);
 }
 
+void Parser::inline_expression() {
+    expr1_();
+}
+
 void Parser::switch_() {
     get();
     if (now.type != Lexeme::OpenParentheses) throw bad_lexeme(now, filename_);
@@ -316,7 +320,7 @@ void Parser::definition_() {
 
     if (now.type == Lexeme::Operation && now.content != L"=") throw bad_lexeme(now, filename_);
     get();
-    expr_();
+    inline_expression();
     if (now.type == Lexeme::Semicolon) return;
     if (now.type == Lexeme::Punctuation) {
         if (now.content != L",") throw bad_lexeme(now, filename_);
@@ -338,7 +342,7 @@ void Parser::array_definition_() {
     if (now.type == Lexeme::Operation && now.content == L"[") {
         while(now.type != Lexeme::Operation || now.content != L"]") {
             get();
-            expr_();
+            inline_expression();
             if (now.content == L"]") break;
             if (now.content != L",") throw bad_lexeme(now, filename_);
         }
@@ -502,17 +506,18 @@ bool Parser::op11(const std::wstring& s) {
 
 void Parser::expr11_() {
     while (now.type == Lexeme::Operation) {
-        if (!op11(now.content)) return;
+        if (!op11(now.content)) break;
         get();
     }
-    if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
+    if (now.type != Lexeme::Identifier && now.type != Lexeme::Literal)
+        throw bad_lexeme(now, filename_);
     expr12_();
 }
 
 void Parser::expr12_() {
     expr13_();
     while (now.type == Lexeme::Operation) {
-        if (now.content != L"++" && now.content != L"--") return;
+        if (now.content != L"++" && now.content != L"--") break;
         get();
     }
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
@@ -542,7 +547,12 @@ void Parser::expr13_() {
 
 void Parser::atom() {
     if (now.type != Lexeme::Identifier && now.type != Lexeme::Literal && now.type != Lexeme::StringLiteral) {
-        if (now.content == L"(") {get(); expr0_();}
+        if (now.content == L"(") get();
+        while (now.content != L")") {
+            inline_expression();
+            if (now.content != L",") throw bad_lexeme(now, filename_);
+            get();
+        }
         if (now.content != L")") throw bad_lexeme(now, filename_);
     }
     if (now.type == Lexeme::Literal || now.type == Lexeme::StringLiteral) {

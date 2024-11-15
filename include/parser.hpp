@@ -54,6 +54,7 @@ class Parser {
         void functionCall_();
         void given_();
         void inline_body_();
+        void inline_expression();
 
 
 
