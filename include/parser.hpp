@@ -16,7 +16,7 @@ class Parser {
         void import_();
 
         void functionDefinition_();
-        void arguments_();
+        void arguments_(bool = false);
         void body_();
         void statement_();
 

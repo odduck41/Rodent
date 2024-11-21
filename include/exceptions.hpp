@@ -54,7 +54,7 @@ public:
         message_ += name;
         message_ += L" at line ";
         message_ += std::to_wstring(line2);
-        message_ += L" first definition at line ";
+        message_ += L", first definition at line ";
         message_ += std::to_wstring(line1);
     }
     [[nodiscard]] const wchar_t* what(int) const noexcept {
