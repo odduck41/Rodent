@@ -5,21 +5,25 @@
 
 class TID {
   public:
-    using variable = std::pair<std::wstring, std::wstring>;
-    TID();
+    struct Variable {
+        std::wstring name{};
+        size_t line{};
+        std::wstring type{};
+    };
+    TID() = default;
     void next_scope();
     void exit_scope();
-    [[nodiscard]] inline bool exists(const variable&) const;
-    void add(const variable&);
+    void add(const Variable&) const;
+    inline void used(const Variable&) const;
   private:
-    auto comparator = [](const variable& a, const variable& b) -> bool {
-        if (a.first < b.first) return false;
-        return a.second >= b.second;
+    [[nodiscard]] inline std::set<Variable>::iterator exists(const Variable&) const;
+    auto comparator = [](const Variable& a, const Variable& b) -> bool {
+        return a.name < b.name;
     };
 
     struct Node {
          Node* parent{};
-         std::set<variable, decltype(comparator)> variables{};
+         std::set<Variable, decltype(comparator)> variables{};
     };
     Node* current{};
 };
