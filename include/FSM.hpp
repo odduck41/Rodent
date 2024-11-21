@@ -162,6 +162,7 @@ class FiniteStateMachine {
   static State onEvent(const states::RTI& state, events::BaseSeparator event);
   static State onEvent(const states::RTI& state, events::AllBasesDigit event);
   static State onEvent(const states::RTI& state, events::DecimalDigit event);
+  State onEvent(const states::RTI& state, events::Operation event);
   static State onEvent(const states::RTI& state, events::Underline event);
   State onEvent(const states::RTI& state, Event event);
 
