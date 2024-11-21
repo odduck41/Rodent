@@ -9,7 +9,7 @@ class TID {
     TID();
     void next_scope();
     void exit_scope();
-    bool exists(const variable&);
+    [[nodiscard]] inline bool exists(const variable&) const;
     void add(const variable&);
   private:
     auto comparator = [](const variable& a, const variable& b) -> bool {
