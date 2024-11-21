@@ -1,6 +1,9 @@
 #pragma once
 
 #include "lexer.hpp"
+#include "TID.hpp"
+
+extern TID variables;
 
 class Parser {
     public:
@@ -26,7 +29,7 @@ class Parser {
         void while_();
         void if_();
         void return_();
-        void definition_();
+        void definition_(std::wstring = L"");
         void array_definition_();
         void expression_();
 

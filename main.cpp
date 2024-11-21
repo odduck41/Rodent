@@ -25,6 +25,12 @@ int main(int argc, const char** argv) {
   } catch (bad_lexeme& err) {
     std::wcerr << err.what(0);
     return -1;
+  } catch (undeclared& err) {
+    std::wcerr << err.what(0);
+    return -1;
+  } catch (redeclaration& err) {
+    std::wcerr << err.what(0);
+    return -1;
   }
 #ifdef _WIN32
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);

@@ -5,6 +5,7 @@
 #include <set>
 
 std::set<std::wstring> imported_;
+TID variables;
 
 bool Parser::get_() {
     ++now_;
@@ -72,6 +73,7 @@ void Parser::import_() {
 void Parser::functionDefinition_() {
     get();
     if (now.type != Lexeme::Identifier) throw bad_lexeme(now, filename_);
+    variables.next_scope();
 
     get();
     if (now.type != Lexeme::OpenParentheses) throw bad_lexeme(now, filename_);
@@ -296,41 +298,56 @@ void Parser::return_() {
     expression_();
 }
 
-void Parser::definition_() {
+void Parser::definition_(std::wstring type) {
     if (now.content == L"array") {
         array_definition_();
         return;
     }
+    if (type.empty()) {
+        type = now.content;
+    }
+
     get();
 
 
     if (now.type == Lexeme::Semicolon) return;
     if (now.type != Lexeme::Identifier) throw bad_lexeme(now, filename_);
 
+    auto last = now;
+
     get();
     if (now.type != Lexeme::Punctuation
         && now.type != Lexeme::Operation
         && now.type != Lexeme::Semicolon) throw bad_lexeme(now, filename_);
-    if (now.type == Lexeme::Semicolon) return;
+    if (now.type == Lexeme::Semicolon) {
+        variables.add(TID::Variable{last.content, last.line, type});
+        return;
+    }
     if (now.type == Lexeme::Punctuation) {
+        variables.add(TID::Variable{last.content, last.line, type});
         if (now.content != L",") throw bad_lexeme(now, filename_);
-        definition_();
+        definition_(type);
         return;
     }
 
     if (now.type == Lexeme::Operation && now.content != L"=") throw bad_lexeme(now, filename_);
     get();
     inline_expression();
+
+    variables.add(TID::Variable{last.content, last.line, type});
     if (now.type == Lexeme::Semicolon) return;
     if (now.type == Lexeme::Punctuation) {
         if (now.content != L",") throw bad_lexeme(now, filename_);
     }
-    definition_();
+    definition_(type);
 }
 
 void Parser::array_definition_() {
     get();
     if (now.type != Lexeme::Identifier) throw bad_lexeme(now, filename_);
+
+    variables.add(TID::Variable{now.content, now.line, L"array"});
+
     get();
     if (now.type == Lexeme::Semicolon) return;
     if (now.content == L",") {
@@ -555,14 +572,22 @@ void Parser::atom() {
         }
         if (now.content != L")") throw bad_lexeme(now, filename_);
     }
+
     if (now.type == Lexeme::Literal || now.type == Lexeme::StringLiteral) {
         get();
         return;
     }
+
+    auto last = now;
+
     get();
     if (now.type == Lexeme::Operation) return;
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
-    if (now.type != Lexeme::OpenParentheses) return;
+
+    if (now.type != Lexeme::OpenParentheses) {
+        variables.used(TID::Variable{last.content, last.line, L""});
+        return;
+    }
     functionCall_();
     get();
 }

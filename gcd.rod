@@ -1,3 +1,6 @@
+
+int k;
+
 func main() -> int {
-    int a = 4, b = 4 + a, c, d = a + b, e, j = 324 + 3, k;
+    int a = 4, b = 4 + k, c, d = a + b, e, j = 324 + 3, k;
 }

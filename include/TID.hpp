@@ -9,21 +9,21 @@ class TID {
         std::wstring name{};
         size_t line{};
         std::wstring type{};
+        bool operator<(const Variable& other) const {
+            return this->name < other.name;
+        }
     };
-    TID() = default;
+    TID();
     void next_scope();
     void exit_scope();
     void add(const Variable&) const;
-    inline void used(const Variable&) const;
+    void used(const Variable&) const;
   private:
-    [[nodiscard]] inline std::set<Variable>::iterator exists(const Variable&) const;
-    auto comparator = [](const Variable& a, const Variable& b) -> bool {
-        return a.name < b.name;
-    };
-
     struct Node {
          Node* parent{};
-         std::set<Variable, decltype(comparator)> variables{};
+         std::set<Variable> variables{};
     };
     Node* current{};
+
+    [[nodiscard]] inline std::set<Variable>::iterator exists(const Variable&, Node* = nullptr) const;
 };

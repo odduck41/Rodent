@@ -69,7 +69,7 @@ public:
     explicit undeclared(const std::wstring& name, const size_t line) {
         message_ = L"Undeclared variable: ";
         message_ += name;
-        message_ += L"at line ";
+        message_ += L" at line ";
         message_ += std::to_wstring(line);
     }
     [[nodiscard]] const wchar_t* what(int) const noexcept {
