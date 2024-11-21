@@ -67,7 +67,7 @@ void FiniteStateMachine::applyState(const states::SpecialSymbols &state) {
 void FiniteStateMachine::applyState(const states::RTI& state) {
   if (reserved_words_.check(state.curr_str)) {
     tokens_.push_back({Lexeme::Reserved, state.curr_str, curr_line_});
-  } else if (type_words_.check(state.curr_str)) {
+  } else if (type_words_.check(state.curr_str) || (state.curr_str[state.curr_str.length() - 1] == L'&' && type_words_.check(state.curr_str.substr(0, state.curr_str.length() - 1)))) {
     tokens_.push_back({Lexeme::Type, state.curr_str, curr_line_});
   } else {
     tokens_.push_back({Lexeme::Identifier, state.curr_str, curr_line_});
@@ -410,6 +410,16 @@ State FiniteStateMachine::onEvent(const states::RTI& state,
 State FiniteStateMachine::onEvent(const states::RTI& state,
                                   const events::DecimalDigit event) {
   return states::RTI{state.curr_str + std::wstring(1, event.symbol)};
+}
+
+  State FiniteStateMachine::onEvent(const states::RTI& state,
+                                    const events::Operation event) {
+  if (event.symbol == L'&') {
+    return states::RTI{state.curr_str + std::wstring(1, event.symbol)};
+  }
+  applyState(state);
+  stop_in_symbol_ = true;
+  return states::Begin{};
 }
 
 State FiniteStateMachine::onEvent(const states::RTI& state,
