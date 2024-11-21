@@ -3,8 +3,6 @@
 #include "lexer.hpp"
 #include "TID.hpp"
 
-extern TID variables;
-
 class Parser {
     public:
         Parser(const std::vector<Token>&, const std::string&);
