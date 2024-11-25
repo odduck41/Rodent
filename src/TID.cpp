@@ -1,12 +1,15 @@
 #include "TID.hpp"
+#include "exceptions.hpp"
 
 #include <stdexcept>
-
-#include "exceptions.hpp"
 
 TID::TID() {
     current = new Node;
     current->parent = nullptr;
+}
+
+TID::~TID() {
+    delete current;;
 }
 
 void TID::next_scope() {
@@ -41,9 +44,3 @@ void TID::used(const Variable& var) const {
     while (nw != nullptr && exists(var, nw) == nw->variables.end()) nw = nw->parent;
     if (nw == nullptr) throw undeclared(var.name, var.line);
 }
-
-// void TID::used(const Variable& var) const {
-// }
-
-
-

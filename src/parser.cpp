@@ -332,6 +332,9 @@ void Parser::return_() {
 }
 
 void Parser::definition_(std::wstring type) {
+    size_t definition_line = now.line;
+    std::vector<std::wstring> definition_name;
+
     if (now.content == L"array") {
         array_definition_();
         return;
@@ -341,7 +344,6 @@ void Parser::definition_(std::wstring type) {
     }
 
     get();
-
 
     if (now.type == Lexeme::Semicolon) return;
     if (now.type != Lexeme::Identifier) throw bad_lexeme(now, filename_);
@@ -585,6 +587,7 @@ void Parser::expr13_() {
     if (now.content == L".") {
         get();
         if (now.type != Lexeme::Identifier) return;
+        // table_of_identificators.used({now.content, now.line, now.type});
         get();
         return;
     }

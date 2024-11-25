@@ -2,6 +2,8 @@
 
 #include <exception>
 #include <string>
+#include <vector>
+#include <iostream>
 #include "basic.hpp"
 
 class bad_flag final : public std::exception {
@@ -69,6 +71,29 @@ public:
     explicit undeclared(const std::wstring& name, const size_t line) {
         message_ = L"Undeclared variable: ";
         message_ += name;
+        message_ += L" at line ";
+        message_ += std::to_wstring(line);
+    }
+    [[nodiscard]] const wchar_t* what(int) const noexcept {
+        return message_.c_str();
+    }
+private:
+    std::wstring message_;
+};
+
+class undeclared_function final : public std::exception {
+public:
+    explicit undeclared_function(const std::wstring& name, const size_t line, const std::vector<std::wstring>& args) {
+        message_ = L"Undeclared function: ";
+        message_ += name;
+        message_ += L"(";
+        for (int i = 0; i < args.size(); ++i) {
+            message_ += args[i];
+            if (i != args.size() - 1) {
+                message_ += L", ";
+            }
+        }
+        message_ += L")";
         message_ += L" at line ";
         message_ += std::to_wstring(line);
     }

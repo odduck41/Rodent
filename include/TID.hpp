@@ -2,7 +2,6 @@
 #include <string>
 #include <set>
 
-
 class TID {
   public:
     struct Variable {
@@ -14,6 +13,7 @@ class TID {
         }
     };
     TID();
+    ~TID();
     void next_scope();
     void exit_scope();
     void add(const Variable&) const;

@@ -1,6 +1,7 @@
 #include "common.hpp"
 #include "parser.hpp"
 #include "Test.h"
+#include "TF.hpp"
 #include <iostream>
 
 // Лол, если basic.hpp - первый include, то оно нахуй падает, хотя везде есть #pragma once...
