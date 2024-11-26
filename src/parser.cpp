@@ -6,6 +6,7 @@
 
 std::set<std::wstring> imported_;
 TID variables;
+TF functions;
 
 bool Parser::get_() {
     ++now_;
