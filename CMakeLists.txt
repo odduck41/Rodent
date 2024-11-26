@@ -12,7 +12,7 @@ include_directories(include)
 
 add_executable(Rodent
         main.cpp
-         ${SOURCES}
-         ${INCLUDE}
+        ${SOURCES}
+        ${INCLUDE}
 )
 
