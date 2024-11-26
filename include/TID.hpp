@@ -17,7 +17,7 @@ class TID {
     void next_scope();
     void exit_scope();
     void add(const Variable&) const;
-    void used(const Variable&) const;
+    [[nodiscard]] std::wstring used(const std::wstring& name, size_t line) const;
   private:
     struct Node {
          Node* parent{};

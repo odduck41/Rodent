@@ -39,8 +39,14 @@ void TID::add(const Variable& var) const {
     current->variables.insert(var);
 }
 
-void TID::used(const Variable& var) const {
+std::wstring TID::used(const std::wstring& name, const size_t line) const {
+    const Variable var{name, 0, L""};
     auto nw = current;
-    while (nw != nullptr && exists(var, nw) == nw->variables.end()) nw = nw->parent;
-    if (nw == nullptr) throw undeclared(var.name, var.line);
+    while (nw != nullptr && exists(var, nw) == nw->variables.end()) {
+        nw = nw->parent;
+    }
+    if (nw == nullptr) {
+        throw undeclared(var.name, line);
+    }
+    return exists(var, nw)->type;
 }
