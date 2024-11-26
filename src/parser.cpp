@@ -445,8 +445,12 @@ void Parser::expr1_() {
     expr2_();
     while (now.type == Lexeme::Operation) {
         if (!op1(now.content)) return;
+        // SemStack push =
         get();
         expr2_();
+        // SemStack.push(value)
+        // lvalue = dvalue; d = don't care
+        // checkbin;
     }
 
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
@@ -623,8 +627,10 @@ void Parser::atom() {
 
     if (now.type != Lexeme::OpenParentheses) {
         variables.used(TID::Variable{last.content, last.line, L""});
+        // SemStack.push(now.type);
         return;
     }
+    // function
     functionCall_();
     get();
 }
