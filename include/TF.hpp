@@ -2,6 +2,7 @@
 #include <string>
 #include <set>
 #include <vector>
+#include "basic.hpp"
 
 class TF {
 public:
@@ -18,8 +19,8 @@ public:
         }
     };
     void add(const Function&);
-    void used(const Function&) const;
-    [[nodiscard]] std::wstring type(const Function&) const;
+    [[nodiscard]] SemUnit used(const Function&) const;
+    [[nodiscard]] SemUnit type(const Function&) const;
 private:
     std::set<Function> functions{};
 

@@ -22,6 +22,11 @@ struct Token {
     size_t line{};
 };
 
+struct SemUnit {
+    std::wstring content{};
+    size_t line{};
+};
+
 // Больше не нужон
 // inline std::wstring& operator+= (std::wstring& s, const Lexeme& l) {
 //     if (l == Lexeme::Reserved) s += L"Reserved";

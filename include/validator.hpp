@@ -2,34 +2,101 @@
 
 #include <stack>
 #include <string>
+#include <map>
 
-struct SemType {
-    std::wstring content{};
+#include "basic.hpp"
+
+// Я ебал это писать
+inline std::map<std::wstring, std::map<std::wstring, std::wstring> > transformations = {
+    {
+        L"int",
+        {
+            {L"char", L"int"},
+            {L"double", L"double"},
+            {L"bool", L"int"},
+            {L"int", L"int"}
+        }
+    },
+
+    {
+        L"char",
+        {
+            {L"int", L"int"},
+            {L"double", L"double"},
+            {L"bool", L"char"},
+            {L"char", L"str"},
+            // {L"str", L"str"}
+        }
+    },
+
+    {
+        L"double",
+        {
+            {L"int", L"double"},
+            {L"double", L"double"},
+            {L"bool", L"double"},
+            {L"char", L"double"}
+        }
+    },
+
+    {
+        L"bool",
+        {
+            {L"int", L"int"},
+            {L"double", L"double"},
+            {L"bool", L"bool"},
+            {L"char", L"char"},
+        }
+    },
+
+    // {L"str",
+    //     {
+    //         {L"str", L"str"},
+    //         {L"char", L"str"}
+    //     }
+    // }
 };
-
-struct Operation : SemType {
-    ;
-};
-
-struct Type : SemType {
-    enum class Val {
-        lvalue, rvalue
-    };
-    Val value{0};
-};
-
 
 struct Element {
-    std::wstring content{};
-    SemType* type{};
+    SemUnit unit;
+
+    virtual ~Element() = default;
+};
+
+
+enum class Val {
+    lvalue, rvalue
+};
+
+struct Operation final : Element {
+    Val value{0};
+    enum class Type {
+        unary, binary
+    };
+
+    Type type{};
+
+    ~Operation() override;
+};
+
+struct Variable final : Element {
+    Val value{0};
+    std::wstring type{};
+
+    Variable() = default;
+
+    Variable(const SemUnit&, Val, const std::wstring &);
 };
 
 class SemStack {
 public:
-    SemStack();
+    SemStack() = default;
+
     void checkBin(); // 3 -> 1
     void checkUno(); // 2 -> 1
-    void push();
+    void push(const Operation&);
+    void push(const Variable&);
+
 private:
-    std::stack<Element>;
+    std::stack<Element*> elements_{};
 };

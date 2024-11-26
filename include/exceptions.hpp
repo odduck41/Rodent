@@ -5,6 +5,7 @@
 #include <vector>
 #include "TF.hpp"
 #include "basic.hpp"
+#include "validator.hpp"
 
 class bad_flag final : public std::exception {
  public:
@@ -121,6 +122,67 @@ public:
         message_ += std::to_wstring(line2);
         message_ += L", first definition at line ";
         message_ += std::to_wstring(line1);
+    }
+    [[nodiscard]] const wchar_t* what(int) const noexcept {
+        return message_.c_str();
+    }
+private:
+    std::wstring message_;
+};
+
+class bad_operator final : std::exception {
+public:
+    explicit bad_operator(const Variable* a, const Element* op, const Variable* b) {
+        if (op == nullptr) {
+            message_ = L"Bad binary operator between ";
+            message_ += a->unit.content;
+            message_ += L" and ";
+            message_ += b->unit.content;
+            message_ += L" operands at line ";
+            message_ += std::to_wstring(a->unit.line);
+            return;
+        }
+        message_ += L"Bad operation ";
+        message_ += op->unit.content;
+        message_ += L" between ";
+        message_ += a->unit.content;
+        message_ += L" and ";
+        message_ += b->unit.content;
+        message_ += L" operands at line ";
+        message_ += std::to_wstring(op->unit.line);
+    }
+
+    explicit bad_operator(const Variable* a, const Variable* op) {
+        if (op == nullptr) {
+            message_ = L"Bad unary operator near ";
+            message_ += a->unit.content;
+            message_ += L" operand at line ";
+            message_ += std::to_wstring(a->unit.line);
+            return;
+        }
+        message_ = L"Bad unary operator near ";
+        message_ += a->unit.content;
+        message_ += L" operand at line ";
+        message_ += std::to_wstring(op->unit.line);
+    }
+
+    [[nodiscard]] const wchar_t* what(int) const noexcept {
+        return message_.c_str();
+    }
+
+private:
+    std::wstring message_{};
+};
+
+class wrong_operands final : std::exception {
+public:
+    explicit wrong_operands(const Variable* a, const Variable* b) {
+        message_ = L"Incongruous types of ";
+        message_ += a->unit.content;
+        message_ += L" and ";
+        message_ += b->unit.content;
+        message_ += L" at line ";
+        message_ += std::to_wstring(a->unit.line);
     }
     [[nodiscard]] const wchar_t* what(int) const noexcept {
         return message_.c_str();
