@@ -629,7 +629,7 @@ void Parser::atom() {
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
 
     if (now.type != Lexeme::OpenParentheses) {
-        variables.used(TID::Variable{last.content, last.line, L""});
+        variables.used(last.content, last.line);
         // SemStack.push(now.type);
         return;
     }

@@ -27,10 +27,26 @@ std::set<TF::Function>::iterator TF::exists(const Function& var, Node* scope) co
     if (scope == nullptr) {
         scope = current;
     }
-    return scope->functions.find(var);
+    auto curr_position = scope->functions.begin();
+
+    while (curr_position != scope->functions.end()) {
+        if (*curr_position == var)
+        {
+            break;
+        }
+        ++curr_position;
+    }
+
+    return curr_position;
 }
 
-void TF::used(const Function& func) const {
+std::wstring TF::used(const std::wstring& name, const std::vector<std::wstring>& wstring_arguments, size_t line) const {
+    std::vector <FunctionArgument> arguments;
+    for (const std::wstring& wstring_arg : wstring_arguments) {
+        arguments.push_back({wstring_arg});
+    }
+    Function func{name, 0, L"", arguments};
+
     auto nw = current;
     while (nw != nullptr && exists(func, nw) == nw->functions.end()) nw = nw->parent;
     if (nw == nullptr) {
@@ -40,8 +56,16 @@ void TF::used(const Function& func) const {
         }
         throw undeclared_function(func.name, func.line, args_types);
     }
+    return exists(func, nw)->type;
 }
 
 void TF::add(const Function& func) const {
+    if (auto other = exists(func); other != current->functions.end()) {
+        std::vector <std::wstring> args;
+        for (const auto& arg : func.arguments) {
+            args.push_back(arg.type);
+        }
+        throw redeclaration_function(func.name, args, other->line, func.line);
+    }
     current->functions.insert(func);
 }
