@@ -1,9 +1,13 @@
 #include "validator.hpp"
 
+#include <utility>
+
 #include "exceptions.hpp"
 
-Variable::Variable(const SemUnit &, Val, const std::wstring &) {
-
+Variable::Variable(const SemUnit& su, Val v, std::wstring  t)
+: value(v), type(std::move(t))
+{
+    this->unit = su;
 }
 
 void SemStack::checkBin() {
@@ -35,19 +39,40 @@ void SemStack::checkBin() {
         throw wrong_operands(a, b);
     }
 
-    const auto var = new Variable(SemUnit{a->unit.content + op->unit.content + b->unit.content, op->unit.line},
+
+    this->push(Variable(SemUnit{a->unit.content + op->unit.content + b->unit.content, op->unit.line},
                                   op->value,
                                   transformations[aType][bType]
-    );
-
-    this->elements_.push(var);
+    ));
     delete a;
     delete op;
     delete b;
 }
 
 void SemStack::checkUno() {
-
+    auto a = elements_.top();
+    elements_.pop();
+    auto op = elements_.top();
+    elements_.pop();
+    bool swapped = false;
+    if (dynamic_cast<Operation*>(a) == nullptr) {
+        std::swap(a, op);
+        swapped = true;
+    }
+    auto value = Val::lvalue;
+    if (!swapped) {
+        value = Val::rvalue;
+    }
+    if (dynamic_cast<Variable*>(a)->type == L"array"
+        || dynamic_cast<Variable*>(a)->type == L"str")
+        throw wrong_operands(dynamic_cast<Variable*>(a));
+    push(Variable{
+        SemUnit{a->unit.content + op->unit.content, a->unit.line},
+        value,
+        dynamic_cast<Variable*>(a)->type
+    });
+    delete a;
+    delete op
 }
 
 void SemStack::push(const Operation& x) {

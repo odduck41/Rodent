@@ -63,7 +63,6 @@ struct Element {
     virtual ~Element() = default;
 };
 
-
 enum class Val {
     lvalue, rvalue
 };
@@ -85,7 +84,7 @@ struct Variable final : Element {
 
     Variable() = default;
 
-    Variable(const SemUnit&, Val, const std::wstring &);
+    Variable(const SemUnit&, Val, std::wstring );
 };
 
 class SemStack {

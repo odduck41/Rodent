@@ -184,6 +184,12 @@ public:
         message_ += L" at line ";
         message_ += std::to_wstring(a->unit.line);
     }
+    explicit wrong_operands(const Variable* a) {
+        message_ += L"Bad type of operand ";
+        message_ += a->unit.content;
+        message_ += L" at line ";
+        message_ += std::to_wstring(a->unit.line);
+    }
     [[nodiscard]] const wchar_t* what(int) const noexcept {
         return message_.c_str();
     }
