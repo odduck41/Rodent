@@ -429,13 +429,24 @@ void Parser::expr_() {
 
 void Parser::expr0_() {
     expr1_();
+    auto counter = 0ll;
     while (now.type == Lexeme::Punctuation) {
-        if (now.content != L",") return;
+        if (now.content != L",") goto end;
+        ++counter;
+        // SemStack push =
+        auto ptr = operations.push(Operation{
+            Val::lvalue,
+            SemUnit{now.content, now.line},
+            Operation::Type::binary
+        });
         get();
         expr1_();
+        ptr->value = operations.topVariable().value;
     }
 
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
+    end:
+    while (counter--) operations.checkBin();
 }
 
 bool Parser::op1(const std::wstring& s) {
@@ -447,72 +458,126 @@ bool Parser::op1(const std::wstring& s) {
 
 void Parser::expr1_() {
     expr2_();
+    auto counter = 0ll;
     while (now.type == Lexeme::Operation) {
-        if (!op1(now.content)) return;
-        // SemStack push =
+        if (!op1(now.content)) goto end;
+        ++counter;
+        operations.push(Operation{
+            Val::lvalue,
+            SemUnit{now.content, now.line},
+            Operation::Type::binary
+        });
         get();
         expr2_();
+        // SemStack push =
         // SemStack.push(value)
         // lvalue = dvalue; d = don't care
         // checkbin;
     }
 
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
+    end:
+    while (counter--) operations.checkBin();
 }
 
 void Parser::expr2_() {
     expr3_();
+    auto counter = 0ll;
     while (now.type == Lexeme::Operation) {
-        if (now.content != L"||") return;
+        if (now.content != L"||") goto end;
+        ++counter;
+        operations.push(Operation{
+            Val::rvalue,
+            SemUnit{now.content, now.line},
+            Operation::Type::binary
+        });
         get();
         expr3_();
     }
 
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
+    end:
+    while (counter--) operations.checkBin();
 }
 
 void Parser::expr3_() {
     expr4_();
+    auto counter = 0ll;
     while (now.type == Lexeme::Operation) {
-        if (now.content != L"&&") return;
+        if (now.content != L"&&") goto end;
+        ++counter;
+        operations.push(Operation{
+            Val::rvalue,
+            SemUnit{now.content, now.line},
+            Operation::Type::binary
+        });
         get();
         expr4_();
     }
 
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
+    end:
+    while (counter--) operations.checkBin();
 }
 
 void Parser::expr4_() {
     expr5_();
+    auto counter = 0;
     while (now.type == Lexeme::Operation) {
-        if (now.content != L"|") return;
+        if (now.content != L"|") goto end;
+        ++counter;
+        operations.push(Operation{
+            Val::rvalue,
+            SemUnit{now.content, now.line},
+            Operation::Type::binary
+        });
         get();
         expr5_();
     }
 
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
+    end:
+    while (counter--) operations.checkBin();
 }
 
 void Parser::expr5_() {
     expr6_();
+    auto counter = 0;
     while (now.type == Lexeme::Operation) {
-        if (now.content != L"&") return;
+        if (now.content != L"&") goto end;
+        ++counter;
+        operations.push(Operation{
+            Val::rvalue,
+            SemUnit{now.content, now.line},
+            Operation::Type::binary
+        });
         get();
         expr6_();
     }
 
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
+    end:
+    while (counter--) operations.checkBin();
 }
 
 void Parser::expr6_() {
     expr7_();
+    auto counter = 0ll;
     while (now.type == Lexeme::Operation) {
-        if (now.content != L"==" && now.content != L"!=") return;
+        if (now.content != L"==" && now.content != L"!=") goto end;
+        ++counter;
+        operations.push(Operation{
+            Val::rvalue,
+            SemUnit{now.content, now.line},
+            Operation::Type::binary
+        });
         get();
         expr7_();
     }
 
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
+    end:
+    while (counter--) operations.checkBin();
 }
 
 bool Parser::op7(const std::wstring& s) {
@@ -521,48 +586,81 @@ bool Parser::op7(const std::wstring& s) {
 
 void Parser::expr7_() {
     expr8_();
+    auto counter = 0ll;
     while (now.type == Lexeme::Operation) {
-        if (!op7(now.content)) return;
+        if (!op7(now.content)) goto end;
+        ++counter;
+        operations.push(Operation{
+            Val::rvalue,
+            SemUnit{now.content, now.line},
+            Operation::Type::binary
+        });
         get();
         expr8_();
     }
 
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
+    end:
+    while (counter--) operations.checkBin();
 }
 
 void Parser::expr8_() {
     expr9_();
+    auto counter = 0ll;
     while (now.type == Lexeme::Operation) {
-        if (now.content != L">>" && now.content != L"<<") return;
+        if (now.content != L">>" && now.content != L"<<") goto end;
+        ++counter;
+        operations.push(Operation{
+            Val::rvalue,
+            SemUnit{now.content, now.line},
+            Operation::Type::binary
+        });
         get();
         expr9_();
     }
 
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
+    end:
+    while (counter--) operations.checkBin();
 }
 
 void Parser::expr9_() {
     expr10_();
+    auto counter = 0ll;
     while (now.type == Lexeme::Operation) {
-        if (now.content != L"+" && now.content != L"-") return;
+        if (now.content != L"+" && now.content != L"-") goto end;
+        operations.push(Operation{
+            Val::rvalue,
+            SemUnit{now.content, now.line},
+            Operation::Type::binary
+        });
+        ++counter;
         get();
         expr10_();
     }
 
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
+    end:
+    while (counter--) operations.checkBin();
 }
 
 void Parser::expr10_() {
     expr11_();
     auto counter = 0ll;
     while (now.type == Lexeme::Operation) {
-        if (now.content != L"*" && now.content != L"/" && now.content != L"%") return;
+        if (now.content != L"*" && now.content != L"/" && now.content != L"%") goto end;
         ++counter;
+        operations.push(Operation{
+            Val::rvalue,
+            SemUnit{now.content, now.line},
+            Operation::Type::binary
+        });
         get();
         expr11_();
     }
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
-    operations.checkBin();
+    end:
+    while (counter--) operations.checkBin();
 }
 
 bool Parser::op11(const std::wstring& s) {

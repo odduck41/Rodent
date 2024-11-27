@@ -95,12 +95,13 @@ public:
 
     void checkBin(); // 3 -> 1
     void checkUno(); // 2 -> 1
-    void push(const Operation&);
-    void push(const Variable&);
+    Operation* push(const Operation&);
+    Variable* push(const Variable&);
     std::wstring topType();
     std::wstring topOperation();
     Variable SemStack::topVariable();
     void pop();
+    ~SemStack();
 private:
     std::stack<Element*> elements_{};
 };
