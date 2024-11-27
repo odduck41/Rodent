@@ -350,7 +350,7 @@ void Parser::definition_(std::wstring type) {
     if (now.type == Lexeme::Semicolon) return;
     if (now.type != Lexeme::Identifier) throw bad_lexeme(now, filename_);
 
-    auto last = now;
+    auto last = now; // type
 
     get();
     if (now.type != Lexeme::Punctuation
@@ -370,7 +370,7 @@ void Parser::definition_(std::wstring type) {
     if (now.type == Lexeme::Operation && now.content != L"=") throw bad_lexeme(now, filename_);
     get();
     inline_expression();
-
+    if (operations.topVariable().type != last.content)
     variables.add(TID::Variable{last.content, last.line, type});
     if (now.type == Lexeme::Semicolon) return;
     if (now.type == Lexeme::Punctuation) {
@@ -393,6 +393,7 @@ void Parser::array_definition_() {
     }
     if (now.type == Lexeme::Operation && now.content != L"=") throw bad_lexeme(now, filename_);
     get();
+    // array a = [];
     if (now.type == Lexeme::Operation && now.content == L"[") {
         while(now.type != Lexeme::Operation || now.content != L"]") {
             get();
