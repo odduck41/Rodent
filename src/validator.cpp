@@ -67,7 +67,7 @@ void SemStack::checkUno() {
     }
     auto value = Val::lvalue;
     if (!swapped) {
-        value = Val::rvalue;
+        value = Val::rvalue; // Лев блять пиши код я тебя умоляю
     } else {
         if (op->unit.content.size() == 2) {
             if (dynamic_cast<Variable*>(a)->value != Val::lvalue)
