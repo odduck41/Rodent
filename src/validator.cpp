@@ -97,14 +97,16 @@ void SemStack::checkUno() {
     delete op;
 }
 
-void SemStack::push(const Operation& x) {
+Operation* SemStack::push(const Operation& x) {
     const auto op = new Operation(x);
     this->elements_.push(op);
+    return op;
 }
 
-void SemStack::push(const Variable& x) {
-    const auto op = new Variable(x);
-    this->elements_.push(op);
+Variable* SemStack::push(const Variable& x) {
+    const auto var = new Variable(x);
+    this->elements_.push(var);
+    return var;
 }
 
 void SemStack::pop() {
@@ -130,4 +132,12 @@ std::wstring SemStack::topOperation() {
     if (dynamic_cast<Operation*>(elements_.top()) == nullptr)
         throw std::logic_error("bad interpretation");
     return dynamic_cast<Operation*>(elements_.top())->unit.content;
+}
+
+SemStack::~SemStack() {
+    while (!elements_.empty()) {
+        const auto p = elements_.top();
+        elements_.pop();
+        delete p;
+    }
 }
