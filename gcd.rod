@@ -1,21 +1,9 @@
 
-int k;
+int b = 4;
+int k = b + 1;
 
-func main(int t = 3, int fr = 4) -> int {
-    int a = 4, b = 4 + k, c, d = a + b, e, j = 324 + 3, k;
-    array ab;
-    array bb = [1, 2, 3], cb = ab;
 
-    for (int i = 1; i < 4; ++i) {
-        // int i = 4;
-        i = 4;
-    }
-
-    while (e == 1) {
-        ++a;
-    }
-
-    do {
-        --e;
-    } while (e);
+func main() -> int {
+    int e = k;
+    while (e--) {}
 }

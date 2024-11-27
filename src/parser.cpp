@@ -239,6 +239,9 @@ void Parser::doWhile_() {
 
     get();
     expr_();
+    if (operations.topVariable().type == L"str" || operations.topVariable().type == L"str")
+        throw type_error(operations.topVariable().unit.content, operations.topVariable().unit.line);
+    operations.pop();
 
     if (now.type != Lexeme::CloseParentheses) throw bad_lexeme(now, filename_);
     get();
@@ -264,6 +267,9 @@ void Parser::for_() {
     get();
     if (now.type != Lexeme::Semicolon) {
         expr_();
+        if (operations.topVariable().type == L"str" || operations.topVariable().type == L"str")
+            throw type_error(operations.topVariable().unit.content, operations.topVariable().unit.line);
+        operations.pop();
         if (now.type != Lexeme::Semicolon) throw bad_lexeme(now, filename_);
     }
 
@@ -286,6 +292,9 @@ void Parser::while_() {
 
     get();
     expr_();
+    if (operations.topVariable().type == L"str" || operations.topVariable().type == L"str")
+        throw type_error(operations.topVariable().unit.content, operations.topVariable().unit.line);
+    operations.pop();
 
     if (now.type != Lexeme::CloseParentheses) throw bad_lexeme(now, filename_);
 
@@ -302,7 +311,9 @@ void Parser::if_() {
 
     get();
     expr_();
-    if (operations.topVariable().type == L"str" || operations.topVariable().type == L"str") throw type_error()
+    if (operations.topVariable().type == L"str" || operations.topVariable().type == L"str")
+        throw type_error(operations.topVariable().unit.content, operations.topVariable().unit.line);
+    operations.pop();
     if (now.type != Lexeme::CloseParentheses) throw bad_lexeme(now, filename_);
 
     get();
@@ -335,6 +346,7 @@ void Parser::return_() {
 
 void Parser::definition_(std::wstring type) {
     size_t definition_line = now.line;
+    auto var_type = now.content;
     std::vector<std::wstring> definition_name;
 
     if (now.content == L"array") {
@@ -370,8 +382,8 @@ void Parser::definition_(std::wstring type) {
     if (now.type == Lexeme::Operation && now.content != L"=") throw bad_lexeme(now, filename_);
     get();
     inline_expression();
-    if (operations.topVariable().type != last.content)
-        throw type_error(last.content, operations.topVariable().type, last.line);
+    if (operations.topVariable().type != var_type)
+        throw type_error(var_type, operations.topVariable().type, last.line);
 
     operations.pop();
 
@@ -698,15 +710,15 @@ void Parser::expr11_() {
 void Parser::expr12_() {
     expr13_();
     if (now.type == Lexeme::Operation) {
-        if (now.content == L"++" && now.content == L"--") {
+        if (now.content == L"++" || now.content == L"--") {
             operations.push(Operation{
                 Val::rvalue,
                 SemUnit{now.content, now.line},
                 Operation::Type::unary
             });
             operations.checkUno();
+            get();
         }
-        get();
     }
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
 }
@@ -745,7 +757,21 @@ void Parser::atom() {
         if (now.content != L")") throw bad_lexeme(now, filename_);
     }
 
-    if (now.type == Lexeme::Literal || now.type == Lexeme::StringLiteral) {
+    if (now.type == Lexeme::Literal) {
+        operations.push(Variable{
+            SemUnit(now.content, now.line),
+            Val::rvalue,
+            L"int"
+        });
+        get();
+        return;
+    }
+    if (now.type == Lexeme::StringLiteral) {
+        operations.push(Variable{
+            SemUnit(now.content, now.line),
+            Val::rvalue,
+            L"str"
+        });
         get();
         return;
     }
@@ -753,20 +779,20 @@ void Parser::atom() {
     auto last = now;
 
     get();
-    if (now.type == Lexeme::Operation) return;
+    if (now.type == Lexeme::Operation) goto end;
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
 
-    if (now.type != Lexeme::OpenParentheses) {
-        operations.push(Variable(
+    if (now.type != Lexeme::OpenParentheses) goto end;
+    functionCall_();
+    get();
+    return;
+    end:
+    operations.push(Variable(
             SemUnit{now.content, now.line},
             Val::lvalue,
             variables.used(last.content, last.line)
             )
         );
-        return;
-    }
-    functionCall_();
-    get();
 }
 
 void Parser::functionCall_() {

@@ -99,7 +99,7 @@ public:
     Variable* push(const Variable&);
     std::wstring topType();
     std::wstring topOperation();
-    Variable SemStack::topVariable();
+    Variable topVariable();
     void pop();
     ~SemStack();
 private:

@@ -77,7 +77,7 @@ void SemStack::checkUno() {
         swapped = true;
     }
     auto value = Val::lvalue;
-    if (!swapped) {
+    if (swapped) {
         value = Val::rvalue; // Лев блять пиши код я тебя умоляю
     } else {
         if (op->unit.content.size() == 2) {
@@ -116,6 +116,7 @@ void SemStack::pop() {
 }
 
 Variable SemStack::topVariable() {
+    if (elements_.empty()) throw std::logic_error("bad interpretation");
     if (dynamic_cast<Variable*>(elements_.top()) == nullptr)
         throw std::logic_error("bad interpretation");
 
@@ -123,12 +124,14 @@ Variable SemStack::topVariable() {
 }
 
 std::wstring SemStack::topType() {
+    if (elements_.empty()) throw std::logic_error("bad interpretation");
     if (dynamic_cast<Variable*>(elements_.top()) == nullptr)
         throw std::logic_error("bad interpretation");
     return dynamic_cast<Variable*>(elements_.top())->type;
 }
 
 std::wstring SemStack::topOperation() {
+    if (elements_.empty()) throw std::logic_error("bad interpretation");
     if (dynamic_cast<Operation*>(elements_.top()) == nullptr)
         throw std::logic_error("bad interpretation");
     return dynamic_cast<Operation*>(elements_.top())->unit.content;

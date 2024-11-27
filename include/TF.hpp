@@ -48,7 +48,7 @@ public:
     void add(const Function&);
     // [[nodiscard]] SemUnit used(const Function&) const;
     [[nodiscard]] std::wstring type(const Function&) const;
-    Variable TF::used(const Token& t, const std::vector<std::wstring>&);
+    Variable used(const Token& t, const std::vector<std::wstring>&);
 private:
     std::set<Function> functions{};
 
