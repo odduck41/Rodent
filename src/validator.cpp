@@ -72,7 +72,7 @@ void SemStack::checkUno() {
         dynamic_cast<Variable*>(a)->type
     });
     delete a;
-    delete op
+    delete op;
 }
 
 void SemStack::push(const Operation& x) {
