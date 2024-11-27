@@ -5,7 +5,12 @@
 
 #include "exceptions.hpp"
 
-Variable::Variable(const SemUnit& su, Val v, std::wstring  t)
+Operation::Operation(const Val& v, const SemUnit& su, const Type t)
+: value(v), type(t) {
+    this->unit = su;
+}
+
+Variable::Variable(const SemUnit& su, const Val v, std::wstring t)
 : value(v), type(std::move(t))
 {
     this->unit = su;
@@ -63,6 +68,11 @@ void SemStack::checkUno() {
     auto value = Val::lvalue;
     if (!swapped) {
         value = Val::rvalue;
+    } else {
+        if (op->unit.content.size() == 2) {
+            if (dynamic_cast<Variable*>(a)->value != Val::lvalue)
+                throw wrong_operands(dynamic_cast<Variable*>(a));
+        }
     }
     if (dynamic_cast<Variable*>(a)->type == L"array"
         || dynamic_cast<Variable*>(a)->type == L"str")
@@ -90,6 +100,13 @@ void SemStack::pop() {
     const auto ptr = elements_.top();
     elements_.pop();
     delete ptr;
+}
+
+Variable SemStack::topVariable() {
+    if (dynamic_cast<Variable*>(elements_.top()) == nullptr)
+        throw std::logic_error("bad interpretation");
+
+    return *dynamic_cast<Variable*>(elements_.top());
 }
 
 std::wstring SemStack::topType() {

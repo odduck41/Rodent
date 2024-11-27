@@ -39,7 +39,7 @@ void TID::add(const Variable& var) const {
     current->variables.insert(var);
 }
 
-SemUnit TID::used(const std::wstring& name, const size_t line) const {
+std::wstring TID::used(const std::wstring& name, const size_t line) const {
     const Variable var{name, 0, L""};
     auto nw = current;
     while (nw != nullptr && exists(var, nw) == nw->variables.end()) {
@@ -49,5 +49,5 @@ SemUnit TID::used(const std::wstring& name, const size_t line) const {
         throw undeclared(var.name, line);
     }
     auto ex = exists(var, nw);
-    return {ex->type, ex->line};
+    return ex->type;
 }

@@ -554,12 +554,15 @@ void Parser::expr9_() {
 
 void Parser::expr10_() {
     expr11_();
+    auto counter = 0ll;
     while (now.type == Lexeme::Operation) {
         if (now.content != L"*" && now.content != L"/" && now.content != L"%") return;
+        ++counter;
         get();
         expr11_();
     }
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
+    operations.checkBin();
 }
 
 bool Parser::op11(const std::wstring& s) {
@@ -567,19 +570,39 @@ bool Parser::op11(const std::wstring& s) {
 }
 
 void Parser::expr11_() {
+    auto counter = 0ll;
     while (now.type == Lexeme::Operation) {
-        if (!op11(now.content)) break;
+        ++counter;
+        if (!op11(now.content)) {
+            auto value = Val::rvalue;
+            if (now.content.size() == 2) {
+                value = Val::lvalue;
+            }
+            operations.push(Operation{
+                value,
+                SemUnit{now.content, now.line},
+                Operation::Type::unary
+            });
+        }
         get();
     }
     if (now.type != Lexeme::Identifier && now.type != Lexeme::Literal)
         throw bad_lexeme(now, filename_);
     expr12_();
+    while (counter--) operations.checkBin();
 }
 
 void Parser::expr12_() {
     expr13_();
-    while (now.type == Lexeme::Operation) {
-        if (now.content != L"++" && now.content != L"--") break;
+    if (now.type == Lexeme::Operation) {
+        if (now.content == L"++" && now.content == L"--") {
+            operations.push(Operation{
+                Val::rvalue,
+                SemUnit{now.content, now.line},
+                Operation::Type::unary
+            });
+            operations.checkUno();
+        }
         get();
     }
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
@@ -631,22 +654,22 @@ void Parser::atom() {
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
 
     if (now.type != Lexeme::OpenParentheses) {
-        variables.used(last.content, last.line);
-        // SemStack.push(now.type);
+        operations.push(Variable(
+            SemUnit{now.content, now.line},
+            Val::lvalue,
+            variables.used(last.content, last.line)
+            )
+        );
         return;
     }
-    // function
     functionCall_();
     get();
 }
 
 void Parser::functionCall_() {
-    const auto name = now.content;
+    const auto token = now;
     get();
-    given_();
-    auto type = functions.used(TF::Function{});
-    operations.push(Variable{
-    });
+    operations.push(functions.used(token, given_()));
     if (now.type != Lexeme::CloseParentheses) throw bad_lexeme(now, filename_);
 }
 

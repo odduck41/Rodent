@@ -74,6 +74,10 @@ struct Operation final : Element {
     };
 
     Type type{};
+
+    Operation() = default;
+
+    Operation(const Val&, const SemUnit&, Type);
 };
 
 struct Variable final : Element {
@@ -95,6 +99,7 @@ public:
     void push(const Variable&);
     std::wstring topType();
     std::wstring topOperation();
+    Variable SemStack::topVariable();
     void pop();
 private:
     std::stack<Element*> elements_{};
