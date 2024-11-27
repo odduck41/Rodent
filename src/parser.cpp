@@ -7,6 +7,7 @@
 std::set<std::wstring> imported_;
 TID variables;
 TF functions;
+SemStack operations;
 
 bool Parser::get_() {
     ++now_;
@@ -640,18 +641,30 @@ void Parser::atom() {
 }
 
 void Parser::functionCall_() {
+    const auto name = now.content;
     get();
     given_();
+    auto type = functions.used(TF::Function{});
+    operations.push(Variable{
+    });
     if (now.type != Lexeme::CloseParentheses) throw bad_lexeme(now, filename_);
 }
 
-void Parser::given_() {
-    if (now.type == Lexeme::CloseParentheses) return;
+std::vector<std::wstring> Parser::given_() {
+    if (now.type == Lexeme::CloseParentheses) return {};
+    std::vector<std::wstring> types;
+
     expr_();
+
+    types.push_back(operations.topType());
+    operations.pop();
     while (now.content == L",") {
         get();
         expr_();
+        types.push_back(operations.topType());
+        operations.pop();
     }
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
     if (now.type != Lexeme::CloseParentheses) throw bad_lexeme(now, filename_);
+    return types;
 }

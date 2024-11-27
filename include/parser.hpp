@@ -56,7 +56,7 @@ private:
 
 
     void functionCall_();
-    void given_();
+    std::vector<std::wstring> given_();
     void inline_body_();
     void inline_expression();
 

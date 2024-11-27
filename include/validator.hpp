@@ -74,8 +74,6 @@ struct Operation final : Element {
     };
 
     Type type{};
-
-    ~Operation() override;
 };
 
 struct Variable final : Element {
@@ -95,7 +93,9 @@ public:
     void checkUno(); // 2 -> 1
     void push(const Operation&);
     void push(const Variable&);
-
+    std::wstring topType();
+    std::wstring topOperation();
+    void pop();
 private:
     std::stack<Element*> elements_{};
 };

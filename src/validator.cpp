@@ -1,5 +1,6 @@
 #include "validator.hpp"
 
+#include <stdexcept>
 #include <utility>
 
 #include "exceptions.hpp"
@@ -83,4 +84,22 @@ void SemStack::push(const Operation& x) {
 void SemStack::push(const Variable& x) {
     const auto op = new Variable(x);
     this->elements_.push(op);
+}
+
+void SemStack::pop() {
+    const auto ptr = elements_.top();
+    elements_.pop();
+    delete ptr;
+}
+
+std::wstring SemStack::topType() {
+    if (dynamic_cast<Variable*>(elements_.top()) == nullptr)
+        throw std::logic_error("bad interpretation");
+    return dynamic_cast<Variable*>(elements_.top())->type;
+}
+
+std::wstring SemStack::topOperation() {
+    if (dynamic_cast<Operation*>(elements_.top()) == nullptr)
+        throw std::logic_error("bad interpretation");
+    return dynamic_cast<Operation*>(elements_.top())->unit.content;
 }
