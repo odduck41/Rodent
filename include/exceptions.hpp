@@ -208,6 +208,13 @@ public:
         message_ += std::to_wstring(line);
         message_ += L";";
     }
+    explicit type_error(const std::wstring& a, const size_t line) {
+        message_ = L"Error of processing type ";
+        message_ += a;
+        message_ += L" at line ";
+        message_ += std::to_wstring(line);
+        message_ += L";";
+    }
     [[nodiscard]] const wchar_t* what(int) const noexcept {
         return message_.c_str();
     }
