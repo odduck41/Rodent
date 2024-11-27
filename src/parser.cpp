@@ -302,7 +302,7 @@ void Parser::if_() {
 
     get();
     expr_();
-
+    if (operations.topVariable().type == L"str" || operations.topVariable().type == L"str") throw type_error()
     if (now.type != Lexeme::CloseParentheses) throw bad_lexeme(now, filename_);
 
     get();
@@ -350,7 +350,7 @@ void Parser::definition_(std::wstring type) {
     if (now.type == Lexeme::Semicolon) return;
     if (now.type != Lexeme::Identifier) throw bad_lexeme(now, filename_);
 
-    auto last = now; // type
+     const auto last = now; // type
 
     get();
     if (now.type != Lexeme::Punctuation
@@ -371,6 +371,10 @@ void Parser::definition_(std::wstring type) {
     get();
     inline_expression();
     if (operations.topVariable().type != last.content)
+        throw type_error(last.content, operations.topVariable().type, last.line);
+
+    operations.pop();
+
     variables.add(TID::Variable{last.content, last.line, type});
     if (now.type == Lexeme::Semicolon) return;
     if (now.type == Lexeme::Punctuation) {
