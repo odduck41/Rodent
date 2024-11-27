@@ -16,6 +16,16 @@ Variable::Variable(const SemUnit& su, const Val v, std::wstring t)
     this->unit = su;
 }
 
+bool requireLvalue (const std::wstring& operation) {
+    return (operation == L"=" ||
+        (operation.size() == 2 &&
+            (operation[1] == '=') &&
+            (operation[0] != '>'
+                && operation[0] != '<'
+                && operation[0] != '=')
+            ));
+}
+
 void SemStack::checkBin() {
     const auto a = dynamic_cast<Variable*>(elements_.top());
     elements_.pop();
@@ -44,7 +54,8 @@ void SemStack::checkBin() {
     if (!transformations.contains(aType) || !transformations[aType].contains(bType)) {
         throw wrong_operands(a, b);
     }
-
+    if (requireLvalue(op->unit.content) && b->value != Val::lvalue)
+        throw wrong_operands(a);
 
     this->push(Variable(SemUnit{a->unit.content + op->unit.content + b->unit.content, op->unit.line},
                                   op->value,
