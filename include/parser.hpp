@@ -28,7 +28,7 @@ class Parser {
         void if_();
         void return_();
 
-        void definition_();
+        void definition_(std::wstring = L"#");
         void array_definition_();
         void expression_();
 

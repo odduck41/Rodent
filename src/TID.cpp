@@ -19,6 +19,12 @@ void TID::push(const Token& type, const Token& name) const {
     current->variables.insert({name.content, type.content});
 }
 
+void TID::push(const Type& type, const Token& name) const {
+    if (current->variables.contains({name.content, type})) throw redeclaration(name);
+    current->variables.insert({name.content, type});
+}
+
+
 Type TID::used(const Token& name) const {
     auto now = current;
     while (now != nullptr) {

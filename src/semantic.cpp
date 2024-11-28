@@ -71,7 +71,7 @@ void Semantic::checkUno() {
         if (swapped && !isLvalue(dynamic_cast<Value*>(a)->type)) throw bad_value(a);
     }
 
-    if (dynamic_cast<Value*>(a)->type == L"array" || dynamic_cast<Value*>(a)->type == L"str")
+    if (dynamic_cast<Value*>(a)->type.find(L"array") || dynamic_cast<Value*>(a)->type == L"str")
         throw wrong_operands(a);
 
     const auto element = new Value;

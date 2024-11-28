@@ -13,6 +13,7 @@ public:
     void exitScope();
 
     void push(const Token&, const Token&) const;
+    void push(const Type&, const Token&) const;
     [[nodiscard]] Type used(const Token&) const;
 private:
     struct Scope {

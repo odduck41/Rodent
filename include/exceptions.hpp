@@ -167,6 +167,12 @@ public:
         message_ += t.content;
         message_ += L" at line ";
         message_ += std::to_wstring(t.line);
+    }
+    explicit bad_type(const Type& t, const size_t line) {
+        message_ += L"Wrong type of variable ";
+        message_ += t;
+        message_ += L" at line ";
+        message_ += std::to_wstring(line);
     };
     [[nodiscard]] const wchar_t* what(int) const noexcept {
         return message_.c_str();

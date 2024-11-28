@@ -231,6 +231,9 @@ void Parser::doWhile_() {
     get();
     expr_();
 
+    if (!isComingDown(expressions.top(), L"bool")) throw bad_type(expressions.top(), now.line);
+    expressions.pop();
+
     if (now.type != Lexeme::CloseParentheses) throw bad_lexeme(now, filename_);
     get();
     if (now.type != Lexeme::Semicolon) throw bad_lexeme(now, filename_);
@@ -254,6 +257,8 @@ void Parser::for_() {
     get();
     if (now.type != Lexeme::Semicolon) {
         expr_();
+        if (!isComingDown(expressions.top(), L"bool")) throw bad_type(expressions.top(), now.line);
+        expressions.pop();
         if (now.type != Lexeme::Semicolon) throw bad_lexeme(now, filename_);
     }
 
@@ -275,6 +280,8 @@ void Parser::while_() {
 
     get();
     expr_();
+    if (!isComingDown(expressions.top(), L"bool")) throw bad_type(expressions.top(), now.line);
+    expressions.pop();
 
     if (now.type != Lexeme::CloseParentheses) throw bad_lexeme(now, filename_);
 
@@ -290,6 +297,8 @@ void Parser::if_() {
 
     get();
     expr_();
+    if (!isComingDown(expressions.top(), L"bool")) throw bad_type(expressions.top(), now.line);
+    expressions.pop();
 
     if (now.type != Lexeme::CloseParentheses) throw bad_lexeme(now, filename_);
 
@@ -320,7 +329,10 @@ void Parser::return_() {
     expressions.pop();
 }
 
-void Parser::definition_() {
+void Parser::definition_(std::wstring type) {
+    if (type == L"#") {
+        type = now.content;
+    }
     if (now.content == L"array") {
         array_definition_();
         return;
@@ -329,22 +341,30 @@ void Parser::definition_() {
 
 
     if (now.type == Lexeme::Semicolon) return;
+
     if (now.type != Lexeme::Identifier) throw bad_lexeme(now, filename_);
 
     get();
     if (now.type != Lexeme::Punctuation
         && now.type != Lexeme::Operation
         && now.type != Lexeme::Semicolon) throw bad_lexeme(now, filename_);
-    if (now.type == Lexeme::Semicolon) return;
+    if (now.type == Lexeme::Semicolon) {
+        variables.push(type, now);
+        return;
+    }
     if (now.type == Lexeme::Punctuation) {
         if (now.content != L",") throw bad_lexeme(now, filename_);
-        definition_();
+        variables.push(type, now);
+        definition_(type);
         return;
     }
 
     if (now.type == Lexeme::Operation && now.content != L"=") throw bad_lexeme(now, filename_);
     get();
     inline_expression();
+    if (!isComingDown(expressions.top(), type)) throw bad_type(expressions.top(), now.line);
+    expressions.pop();
+
     if (now.type == Lexeme::Semicolon) return;
     if (now.type == Lexeme::Punctuation) {
         if (now.content != L",") throw bad_lexeme(now, filename_);
@@ -354,11 +374,18 @@ void Parser::definition_() {
 
 void Parser::array_definition_() {
     get();
-    if (now.type != Lexeme::Identifier) throw bad_lexeme(now, filename_);
+    if (now.content != L"<") throw bad_lexeme(now, filename_);
     get();
-    if (now.type == Lexeme::Semicolon) return;
-    if (now.content == L",") {
-        array_definition_();
+    if (now.type != Lexeme::Type) throw bad_lexeme(now, filename_);
+    const auto valueType = now.content;
+    get();
+    if (now.content != L">") throw bad_lexeme(now, filename_);
+    get();
+    if (now.type != Lexeme::Identifier) throw bad_lexeme(now, filename_);
+    const auto name = now;
+    get();
+    if (now.type == Lexeme::Semicolon) {
+        variables.push(L"array<"+valueType+L">", name);
         return;
     }
     if (now.type == Lexeme::Operation && now.content != L"=") throw bad_lexeme(now, filename_);
@@ -367,16 +394,21 @@ void Parser::array_definition_() {
         while(now.type != Lexeme::Operation || now.content != L"]") {
             get();
             inline_expression();
+            if (!isComingDown(expressions.top(), valueType)) throw bad_type(expressions.top(), now.line);
+            expressions.pop();
+
             if (now.content == L"]") break;
             if (now.content != L",") throw bad_lexeme(now, filename_);
         }
+    } else {
+        inline_expression();
+        if (!isComingDown(expressions.top(), L"array<"+valueType+L">"))
+            throw bad_type(expressions.top(), now.line);
+        expressions.pop();
     }
     get();
-    if (now.content == L",") {
-        array_definition_();
-        return;
-    }
 
+    variables.push(L"array<"+valueType+L">", name);
     if (now.type != Lexeme::Semicolon) throw bad_lexeme(now, filename_);
 }
 
