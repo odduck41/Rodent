@@ -2,7 +2,14 @@
 #include "common.hpp"
 #include "exceptions.hpp"
 #include <cstdlib>
+#include "TID.hpp"
+#include "TF.hpp"
+#include "semantic.hpp"
 #include <set>
+
+TID variables;
+TF functions;
+Semantic expressions;
 
 std::set<std::wstring> imported_;
 
@@ -73,21 +80,25 @@ void Parser::functionDefinition_() {
     get();
     if (now.type != Lexeme::Identifier) throw bad_lexeme(now, filename_);
 
+    auto name = now;
+
     get();
     if (now.type != Lexeme::OpenParentheses) throw bad_lexeme(now, filename_);
 
     get();
 
+    std::vector<Token> args;
     if (now.type != Lexeme::CloseParentheses) {
-        arguments_();
+        arguments_(args);
     }
-
 
     get();
     if (now.type != Lexeme::Operation || now.content != L"->") throw bad_lexeme(now, filename_);
 
     get();
     if (now.type != Lexeme::Type) throw bad_lexeme(now, filename_);
+
+    functions.push(now, name, args);
 
     get();
     if (now.type != Lexeme::OpenCurly) throw bad_lexeme(now, filename_);
@@ -96,15 +107,18 @@ void Parser::functionDefinition_() {
 
 }
 
-void Parser::arguments_() {
+void Parser::arguments_(std::vector<Token>& types) {
     if (now.type != Lexeme::Type) throw bad_lexeme(now, filename_);
+    types.push_back(now);
     get();
     if (now.type != Lexeme::Identifier) throw bad_lexeme(now, filename_);
     get();
     if (now.content == L",") {
         get();
-        arguments_();
+
+        arguments_(types);
     }
+
     if (now.type == Lexeme::CloseParentheses) return;
     throw bad_lexeme(now, filename_);
 }
@@ -155,6 +169,10 @@ void Parser::switch_() {
     if (now.type != Lexeme::OpenParentheses) throw bad_lexeme(now, filename_);
     get();
     if (now.type != Lexeme::Identifier) throw bad_lexeme(now, filename_);
+    const auto type = variables.used(now);
+
+    if (type == L"array") throw bad_type(now);
+
     get();
     if (now.type != Lexeme::CloseParentheses) throw bad_lexeme(now, filename_);
     get();
@@ -163,7 +181,7 @@ void Parser::switch_() {
     while (now.type != Lexeme::CloseCurly) {
         if (now.type != Lexeme::Reserved) throw bad_lexeme(now, filename_);
         if (now.content == L"case") {
-            case_();
+            case_(type);
         } else {
             default_();
             break;
@@ -172,9 +190,12 @@ void Parser::switch_() {
     get();
 }
 
-void Parser::case_() {
+void Parser::case_(const Type& type) {
     get();
     if (now.type != Lexeme::Literal && now.type != Lexeme::StringLiteral) throw bad_lexeme(now, filename_);
+    if (now.type == Lexeme::Literal && type == L"str") throw bad_type(now);
+    if (now.type == Lexeme::StringLiteral && type != L"str") throw bad_type(now);
+
     get();
     if (now.type != Lexeme::Operation || now.content != L":") throw bad_lexeme(now, filename_);
     get();
@@ -294,6 +315,9 @@ void Parser::if_() {
 void Parser::return_() {
     get();
     expression_();
+    if (isComingDown(expressions.top(), functions.getLastType()))
+        throw bad_return(expressions.top(), functions.getLastType(), now.line);
+    expressions.pop();
 }
 
 void Parser::definition_() {

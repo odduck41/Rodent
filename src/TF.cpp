@@ -41,6 +41,7 @@ bool operator<(const Function& a, const Function& b) {
 }
 
 void TF::push(const Token& type, const Token& name, const std::vector<Token>& args) {
+    last_ = type.content;
     if (functions.contains({name, args})) throw redefinition(name);
     functions.insert({type, name, args});
 }
@@ -48,4 +49,8 @@ void TF::push(const Token& type, const Token& name, const std::vector<Token>& ar
 Type TF::used(const Token& name, const std::vector<Token>& args) {
     if (const auto ptr = functions.find({name, args}); ptr != functions.end()) return ptr->getType();
     throw undefined(name, 0);
+}
+
+Type TF::getLastType() const {
+    return last_;
 }

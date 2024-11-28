@@ -159,3 +159,35 @@ public:
 private:
     std::wstring message_;
 };
+
+class bad_type final : public std::exception {
+public:
+    explicit bad_type(const Token& t) {
+        message_ += L"Wrong type of variable ";
+        message_ += t.content;
+        message_ += L" at line ";
+        message_ += std::to_wstring(t.line);
+    };
+    [[nodiscard]] const wchar_t* what(int) const noexcept {
+        return message_.c_str();
+    }
+private:
+    std::wstring message_;
+};
+
+class bad_return final : public std::exception {
+public:
+    explicit bad_return(const Type& a, const Type& b, const size_t& line) {
+        message_ += L"Return type ";
+        message_ += a;
+        message_ += L" at line ";
+        message_ += std::to_wstring(line);
+        message_ += L"is not coming down to the function type ";
+        message_ += b;
+    };
+    [[nodiscard]] const wchar_t* what(int) const noexcept {
+        return message_.c_str();
+    }
+private:
+    std::wstring message_;
+};

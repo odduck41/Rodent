@@ -13,19 +13,21 @@ class Parser {
         void import_();
 
         void functionDefinition_();
-        void arguments_();
+        void arguments_(std::vector<Token>&);
         void body_();
         void statement_();
 
         void switch_();
-        void case_();
+        void case_(const Type&);
         void case_body_();
         void default_();
+
         void doWhile_();
         void for_();
         void while_();
         void if_();
         void return_();
+
         void definition_();
         void array_definition_();
         void expression_();

@@ -116,6 +116,12 @@ Type Semantic::top() {
     return dynamic_cast<Value*>(elements.top())->type;
 }
 
+void Semantic::pop() {
+    const auto ptr = elements.top();
+    elements.pop();
+    delete ptr;
+}
+
 Element* Semantic::pushOperation(const Token& operation, const Operation::Val v) {
     const auto op = new Operation;
     op->content = operation.content;

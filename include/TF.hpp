@@ -27,6 +27,8 @@ public:
     TF() = default;
     void push(const Token&, const Token&, const std::vector<Token>&);
     Type used(const Token&, const std::vector<Token>&);
+    [[nodiscard]] Type getLastType() const;
 private:
     std::set<Function> functions{};
+    Type last_;
 };
