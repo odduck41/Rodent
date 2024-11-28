@@ -90,7 +90,7 @@ void Semantic::checkUno() {
     delete op;
 }
 
-Element* Semantic::push(const Token& token, const Operation::Val v = Operation::Val::rvalue) {
+Element* Semantic::push(const Token& token, const Operation::Val v) {
     if (token.type == Lexeme::Operation) return pushOperation(token, v);
     const auto literal = new Value;
     literal->content = token.content;

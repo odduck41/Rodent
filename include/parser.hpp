@@ -53,8 +53,8 @@ class Parser {
         void atom();
 
 
-        void functionCall_();
-        void given_();
+        void functionCall_(const Token&);
+        void given_(std::vector<Type>&);
         void inline_body_();
         void inline_expression();
 

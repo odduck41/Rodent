@@ -612,29 +612,39 @@ void Parser::atom() {
         if (now.content != L")") throw bad_lexeme(now, filename_);
     }
     if (now.type == Lexeme::Literal || now.type == Lexeme::StringLiteral) {
+        expressions.push(now);
         get();
         return;
     }
+    auto var = now;
     get();
     if (now.type == Lexeme::Operation) return;
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
-    if (now.type != Lexeme::OpenParentheses) return;
-    functionCall_();
+    if (now.type != Lexeme::OpenParentheses) {
+        expressions.push(variables.used(now), now.line);
+    };
+    functionCall_(var);
     get();
 }
 
-void Parser::functionCall_() {
+void Parser::functionCall_(const Token& name) {
+    std::vector<Type> args;
     get();
-    given_();
+    given_(args);
+    expressions.push(functions.used(name, args), name.line);
     if (now.type != Lexeme::CloseParentheses) throw bad_lexeme(now, filename_);
 }
 
-void Parser::given_() {
+void Parser::given_(std::vector<Type>& args) {
     if (now.type == Lexeme::CloseParentheses) return;
     expr_();
+    args.push_back(expressions.top());
+    expressions.pop();
     while (now.content == L",") {
         get();
         expr_();
+        args.push_back(expressions.top());
+        expressions.pop();
     }
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
     if (now.type != Lexeme::CloseParentheses) throw bad_lexeme(now, filename_);

@@ -18,6 +18,15 @@ Function::Function(const Token& name, const std::vector<Token>& args)
     }
 }
 
+Function::Function(const Token& name, const std::vector<Type>& args)
+: name_(name.content) {
+    args_.reserve(args.size());
+    for (const auto& arg: args) {
+        args_.push_back(arg);
+    }
+
+}
+
 Name Function::getName() const {
     return name_;
 }
@@ -46,7 +55,7 @@ void TF::push(const Token& type, const Token& name, const std::vector<Token>& ar
     functions.insert({type, name, args});
 }
 
-Type TF::used(const Token& name, const std::vector<Token>& args) {
+Type TF::used(const Token& name, const std::vector<Type>& args) {
     if (const auto ptr = functions.find({name, args}); ptr != functions.end()) return ptr->getType();
     throw undefined(name, 0);
 }
