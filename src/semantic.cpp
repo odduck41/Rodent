@@ -51,6 +51,43 @@ void Semantic::checkBin() {
         element->type += L"&";
     }
     elements.push(element);
+    delete a;
+    delete b;
+    delete op;
+}
+
+void Semantic::checkUno() {
+    auto a = elements.top();
+    elements.pop();
+    auto op = elements.top();
+    elements.pop();
+
+    bool swapped = false;
+    if (dynamic_cast<Operation*>(a) != nullptr) {
+        std::swap(a, op);
+        swapped = true;
+    }
+    if (op->content.size() == 2) {
+        if (swapped && !isLvalue(dynamic_cast<Value*>(a)->type)) throw bad_value(a);
+    }
+
+    if (dynamic_cast<Value*>(a)->type == L"array" || dynamic_cast<Value*>(a)->type == L"str")
+        throw wrong_operands(a);
+
+    const auto element = new Value;
+    if (swapped) {
+        element->content = op->content + a->content;
+        element->type = dynamic_cast<Value *>(a)->lvalue();
+    } else {
+        element->content = a->content + op->content;
+        element->type = dynamic_cast<Value *>(a)->rvalue();
+    }
+    element->line = op->line;
+
+    elements.push(element);
+
+    delete a;
+    delete op;
 }
 
 Element* Semantic::push(const Token& token, const Operation::Val v = Operation::Val::rvalue) {
