@@ -1,4 +1,6 @@
 #pragma once
+#include <map>
+
 
 using Type = std::wstring;
 using Name = std::wstring;
@@ -63,3 +65,55 @@ inline std::wstring asWstring(const Lexeme& l) {
 
     return s;
 }
+
+// Я скопировал это из ветки Semantic, потому что я ебал это писать
+// Но map по-моему лучше чем бесконечность if
+inline std::map<std::wstring, std::map<std::wstring, std::wstring> > transformations = {
+    {
+        L"int",
+        {
+                {L"char", L"int"},
+                {L"double", L"double"},
+                {L"bool", L"int"},
+                {L"int", L"int"}
+        }
+    },
+
+    {
+        L"char",
+        {
+                {L"int", L"int"},
+                {L"double", L"double"},
+                {L"bool", L"char"},
+                {L"char", L"str"},
+                // {L"str", L"str"}
+            }
+    },
+
+    {
+        L"double",
+        {
+                {L"int", L"double"},
+                {L"double", L"double"},
+                {L"bool", L"double"},
+                {L"char", L"double"}
+        }
+    },
+
+    {
+        L"bool",
+        {
+                {L"int", L"int"},
+                {L"double", L"double"},
+                {L"bool", L"bool"},
+                {L"char", L"char"},
+            }
+    },
+
+    // {L"str",
+    //     {
+    //         {L"str", L"str"},
+    //         {L"char", L"str"}
+    //     }
+    // }
+};

@@ -36,8 +36,21 @@ void Semantic::checkBin() {
         op == nullptr
     ) throw bad_operator(a, op, b);
 
-    if (requireLvalue(op->content) && !isLvalue(a->type)) throw
+    if (requireLvalue(op->content) && !isLvalue(a->type)) throw bad_value(a);
 
+    if (!transformations.contains(a->rvalue())
+        || !transformations[a->rvalue()].contains(b->rvalue())) {
+        throw wrong_operands(a, b);
+    }
+
+    const auto element = new Value;
+    element->content = a->content + op->content + b->content;
+    element->type = transformations[a->rvalue()][b->rvalue()];
+    element->line = op->line;
+    if (op->result == Operation::Val::lvalue) {
+        element->type += L"&";
+    }
+    elements.push(element);
 }
 
 Element* Semantic::push(const Token& token, const Operation::Val v = Operation::Val::rvalue) {
