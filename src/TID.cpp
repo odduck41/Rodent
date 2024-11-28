@@ -2,6 +2,12 @@
 
 #include "exceptions.hpp"
 
+
+TID::TID() {
+    current = new Scope;
+    current->parent = nullptr;
+}
+
 void TID::nextScope() {
     const auto parent = current;
     current = new Scope;

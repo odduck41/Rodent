@@ -87,6 +87,7 @@ void Parser::functionDefinition_() {
 
     get();
 
+    variables.nextScope();
     std::vector<Token> args;
     if (now.type != Lexeme::CloseParentheses) {
         arguments_(args);
@@ -104,14 +105,16 @@ void Parser::functionDefinition_() {
     if (now.type != Lexeme::OpenCurly) throw bad_lexeme(now, filename_);
 
     body_();
-
+    variables.exitScope();
 }
 
 void Parser::arguments_(std::vector<Token>& types) {
     if (now.type != Lexeme::Type) throw bad_lexeme(now, filename_);
+    auto type = now;
     types.push_back(now);
     get();
     if (now.type != Lexeme::Identifier) throw bad_lexeme(now, filename_);
+    variables.push(type, now);
     get();
     if (now.content == L",") {
         get();
@@ -343,32 +346,36 @@ void Parser::definition_(std::wstring type) {
     if (now.type == Lexeme::Semicolon) return;
 
     if (now.type != Lexeme::Identifier) throw bad_lexeme(now, filename_);
+    auto name = now;
 
     get();
     if (now.type != Lexeme::Punctuation
         && now.type != Lexeme::Operation
         && now.type != Lexeme::Semicolon) throw bad_lexeme(now, filename_);
     if (now.type == Lexeme::Semicolon) {
-        variables.push(type, now);
+        variables.push(type, name);
         return;
     }
     if (now.type == Lexeme::Punctuation) {
         if (now.content != L",") throw bad_lexeme(now, filename_);
-        variables.push(type, now);
+        variables.push(type, name);
         definition_(type);
         return;
     }
 
-    if (now.type == Lexeme::Operation && now.content != L"=") throw bad_lexeme(now, filename_);
+    if (now.type == Lexeme::Operation && now.content != L"=")
+        throw bad_lexeme(now, filename_);
     get();
     inline_expression();
-    if (!isComingDown(expressions.top(), type)) throw bad_type(expressions.top(), now.line);
+    if (!isComingDown(expressions.top(), type))
+        throw bad_type(expressions.top(), now.line);
     expressions.pop();
 
     if (now.type == Lexeme::Semicolon) return;
     if (now.type == Lexeme::Punctuation) {
         if (now.content != L",") throw bad_lexeme(now, filename_);
     }
+    variables.push(type, name);
     definition_();
 }
 
@@ -621,7 +628,7 @@ void Parser::atom() {
     if (now.type == Lexeme::Operation) return;
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
     if (now.type != Lexeme::OpenParentheses) {
-        expressions.push(variables.used(now), now.line);
+        expressions.push(variables.used(var), var.line);
     };
     functionCall_(var);
     get();

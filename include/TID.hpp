@@ -4,10 +4,9 @@
 
 #include "basic.hpp"
 
-
 class TID {
 public:
-    TID() = default;
+    TID();
 
     void nextScope();
     void exitScope();
@@ -16,6 +15,7 @@ public:
     void push(const Type&, const Token&) const;
     [[nodiscard]] Type used(const Token&) const;
 private:
+
     struct Scope {
         Scope* parent = nullptr;
         std::set<Variable> variables;
