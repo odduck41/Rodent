@@ -1,5 +1,9 @@
 #pragma once
 
+using Type = std::wstring;
+using Name = std::wstring;
+using Variable = std::pair<Name, Type>;
+
 enum class Lexeme {
     Reserved,
     Identifier,

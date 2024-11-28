@@ -69,6 +69,29 @@ public:
         message_ += t.content;
         message_ += L" at line ";
         message_ += std::to_wstring(t.line);
+    }
+
+    explicit undefined(const Token& t, int) {
+        message_ += L"Using of undefined function ";
+        message_ += t.content;
+        message_ += L" at line ";
+        message_ += std::to_wstring(t.line);
+    }
+
+    [[nodiscard]] const wchar_t* what(int) const noexcept {
+        return message_.c_str();
+    }
+private:
+    std::wstring message_;
+};
+
+class redefinition final : public std::exception {
+public:
+    explicit redefinition(const Token& t) {
+        message_ += L"Redefinition of function ";
+        message_ += t.content;
+        message_ += L" at line ";
+        message_ += std::to_wstring(t.line);
     };
     [[nodiscard]] const wchar_t* what(int) const noexcept {
         return message_.c_str();

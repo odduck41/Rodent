@@ -14,17 +14,17 @@ void TID::exitScope() {
     delete useless;
 }
 
-void TID::push(const Token& t, const Token& n) const {
-    if (current->variables.contains({n.content, t.content})) throw redeclaration(n);
-    current->variables.insert({n.content, t.content});
+void TID::push(const Token& type, const Token& name) const {
+    if (current->variables.contains({name.content, type.content})) throw redeclaration(name);
+    current->variables.insert({name.content, type.content});
 }
 
-type TID::used(const Token& n) const {
+Type TID::used(const Token& name) const {
     auto now = current;
     while (now != nullptr) {
-        if (const auto ptr = now->variables.find({n.content, L""}); ptr != now->variables.end())
+        if (const auto ptr = now->variables.find({name.content, L""}); ptr != now->variables.end())
             return ptr->second;
         now = now->parent;
     }
-    throw undefined(n);
+    throw undefined(name);
 }

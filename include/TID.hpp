@@ -4,10 +4,6 @@
 
 #include "basic.hpp"
 
-using type = std::wstring;
-using name = std::wstring;
-
-using variable = std::pair<name, type>;
 
 class TID {
 public:
@@ -17,11 +13,11 @@ public:
     void exitScope();
 
     void push(const Token&, const Token&) const;
-    type used(const Token&) const;
+    [[nodiscard]] Type used(const Token&) const;
 private:
     struct Scope {
         Scope* parent = nullptr;
-        std::set<variable> variables;
+        std::set<Variable> variables;
     };
 
     Scope* current{};
