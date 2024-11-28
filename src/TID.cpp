@@ -1,5 +1,7 @@
 #include "TID.hpp"
 
+#include <algorithm>
+
 #include "exceptions.hpp"
 
 
@@ -34,7 +36,10 @@ void TID::push(const Type& type, const Token& name) const {
 Type TID::used(const Token& name) const {
     auto now = current;
     while (now != nullptr) {
-        if (const auto ptr = now->variables.find({name.content, L""}); ptr != now->variables.end())
+        if (const auto ptr =
+            std::find_if(now->variables.begin(), now->variables.end(),
+                [=](const Variable& x){return name.content == x.first;});
+            ptr != now->variables.end())
             return ptr->second;
         now = now->parent;
     }
