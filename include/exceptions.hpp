@@ -46,3 +46,33 @@ class bad_lexeme final : public std::exception {
 private:
   std::wstring message_;
 };
+
+class redeclaration final : public std::exception {
+public:
+    explicit redeclaration(const Token& t) {
+        message_ += L"Redeclaration of variable ";
+        message_ += t.content;
+        message_ += L" at line ";
+        message_ += std::to_wstring(t.line);
+    };
+    [[nodiscard]] const wchar_t* what(int) const noexcept {
+        return message_.c_str();
+    }
+private:
+    std::wstring message_;
+};
+
+class undefined final : public std::exception {
+public:
+    explicit undefined(const Token& t) {
+        message_ += L"Using of undefined variable ";
+        message_ += t.content;
+        message_ += L" at line ";
+        message_ += std::to_wstring(t.line);
+    };
+    [[nodiscard]] const wchar_t* what(int) const noexcept {
+        return message_.c_str();
+    }
+private:
+    std::wstring message_;
+};
