@@ -1,4 +1,4 @@
 func main() -> int {
     int a = 4;
-    int c = a++ += 4;
+    int c = ++a++ += 4;
 }

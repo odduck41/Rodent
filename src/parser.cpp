@@ -661,7 +661,9 @@ void Parser::expr12_() {
     }
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
     end:
-    if (amount--) expressions.checkUno();
+    if (amount) {
+        expressions.checkUno();
+    }
 }
 
 void Parser::expr13_() {

@@ -14,6 +14,7 @@
 	Token{Type, "int", 3},
 	Token{Identifier, "c", 3},
 	Token{Operation, "=", 3},
+	Token{Operation, "++", 3},
 	Token{Identifier, "a", 3},
 	Token{Operation, "++", 3},
 	Token{Operation, "+=", 3},
