@@ -5,6 +5,13 @@
 #include "basic.hpp"
 #include "semantic.hpp"
 
+class exception : public std::exception {
+public:
+    [[nodiscard]] virtual const wchar_t* what(int) const noexcept {
+        return L"Error";
+    };
+};
+
 class bad_flag final : public std::exception {
  public:
   explicit bad_flag(const char* data) { message_ += data; }
@@ -29,7 +36,7 @@ class lexer_error final : public std::exception {
   std::string message_;
 };
 
-class bad_lexeme final : public std::exception {
+class bad_lexeme final : public exception {
  public:
     explicit bad_lexeme(const Token& t, const std::wstring& filename_) {
         message_ = L"Bad lexeme at line ";
@@ -41,14 +48,14 @@ class bad_lexeme final : public std::exception {
         message_ += L"\t type: ";
         message_ += asWstring(t.type);
     };
-    [[nodiscard]] const wchar_t* what(int) const noexcept {
+    [[nodiscard]] const wchar_t* what(int) const noexcept override {
         return message_.c_str();
     }
 private:
   std::wstring message_;
 };
 
-class redeclaration final : public std::exception {
+class redeclaration final : public exception {
 public:
     explicit redeclaration(const Token& t) {
         message_ += L"Redeclaration of variable ";
@@ -56,14 +63,14 @@ public:
         message_ += L" at line ";
         message_ += std::to_wstring(t.line);
     };
-    [[nodiscard]] const wchar_t* what(int) const noexcept {
+    [[nodiscard]] const wchar_t* what(int) const noexcept override {
         return message_.c_str();
     }
 private:
     std::wstring message_;
 };
 
-class undefined final : public std::exception {
+class undefined final : public exception {
 public:
     explicit undefined(const Token& t) {
         message_ += L"Using of undefined variable ";
@@ -79,14 +86,14 @@ public:
         message_ += std::to_wstring(t.line);
     }
 
-    [[nodiscard]] const wchar_t* what(int) const noexcept {
+    [[nodiscard]] const wchar_t* what(int) const noexcept override {
         return message_.c_str();
     }
 private:
     std::wstring message_;
 };
 
-class redefinition final : public std::exception {
+class redefinition final : public exception {
 public:
     explicit redefinition(const Token& t) {
         message_ += L"Redefinition of function ";
@@ -94,14 +101,14 @@ public:
         message_ += L" at line ";
         message_ += std::to_wstring(t.line);
     };
-    [[nodiscard]] const wchar_t* what(int) const noexcept {
+    [[nodiscard]] const wchar_t* what(int) const noexcept override {
         return message_.c_str();
     }
 private:
     std::wstring message_;
 };
 
-class bad_operator final : public std::exception {
+class bad_operator final : public exception {
 public:
     explicit bad_operator(const Element* a, const Element* op, const Element* b) {
         message_ += L"Expected, that ";
@@ -114,14 +121,14 @@ public:
         message_ += std::to_wstring(op->line);
     }
 
-    [[nodiscard]] const wchar_t* what(int) const noexcept {
+    [[nodiscard]] const wchar_t* what(int) const noexcept override {
         return message_.c_str();
     }
 private:
     std::wstring message_;
 };
 
-class bad_value final : public std::exception {
+class bad_value final : public exception {
 public:
     explicit bad_value(const Element* a) {
         message_ += L"Expected, that ";
@@ -130,14 +137,14 @@ public:
         message_ += std::to_wstring(a->line);
     }
 
-    [[nodiscard]] const wchar_t* what(int) const noexcept {
+    [[nodiscard]] const wchar_t* what(int) const noexcept override {
         return message_.c_str();
     }
 private:
     std::wstring message_;
 };
 
-class wrong_operands final : std::exception {
+class wrong_operands final : exception {
 public:
     explicit wrong_operands(const Element* a, const Element* b) {
         message_ = L"Incongruous types of ";
@@ -153,7 +160,45 @@ public:
         message_ += L" at line ";
         message_ += std::to_wstring(a->line);
     }
-    [[nodiscard]] const wchar_t* what(int) const noexcept {
+    [[nodiscard]] const wchar_t* what(int) const noexcept override {
+        return message_.c_str();
+    }
+private:
+    std::wstring message_;
+};
+
+class bad_type final : public exception {
+public:
+    explicit bad_type(const Token& t) {
+        message_ += L"Wrong type of variable ";
+        message_ += t.content;
+        message_ += L" at line ";
+        message_ += std::to_wstring(t.line);
+    }
+    explicit bad_type(const Type& t, const size_t line) {
+        message_ += L"Wrong type of variable ";
+        message_ += t;
+        message_ += L" at line ";
+        message_ += std::to_wstring(line);
+    };
+    [[nodiscard]] const wchar_t* what(int) const noexcept override {
+        return message_.c_str();
+    }
+private:
+    std::wstring message_;
+};
+
+class bad_return final : public exception {
+public:
+    explicit bad_return(const Type& a, const Type& b, const size_t& line) {
+        message_ += L"Return type ";
+        message_ += a;
+        message_ += L" at line ";
+        message_ += std::to_wstring(line);
+        message_ += L" is not coming down to the function type ";
+        message_ += b;
+    };
+    [[nodiscard]] const wchar_t* what(int) const noexcept override {
         return message_.c_str();
     }
 private:

@@ -30,9 +30,10 @@ public:
     void checkBin();
     void checkUno();
     Semantic() = default;
-    Element* push(const Token&, Operation::Val); // usually for operations
+    Element* push(const Token&, Operation::Val = Operation::Val::rvalue); // usually for operations
     Element* push(const std::wstring&, size_t); // usually for functions and variables
     Type top();
+    void pop();
 private:
     Element* pushOperation(const Token&, Operation::Val);
     std::stack<Element*> elements;

@@ -7,6 +7,7 @@ using Type = std::wstring;
 using Name = std::wstring;
 using Variable = std::pair<Name, Type>;
 
+
 enum class Lexeme {
     Reserved,
     Identifier,
@@ -69,7 +70,7 @@ inline std::wstring asWstring(const Lexeme& l) {
 
 // Я скопировал это из ветки Semantic, потому что я ебал это писать
 // Но map по-моему лучше чем бесконечность if
-inline std::map<std::wstring, std::map<std::wstring, std::wstring> > transformations = {
+inline std::map<Type, std::map<Type, Type>> transformations = {
     {
         L"int",
         {
@@ -118,3 +119,15 @@ inline std::map<std::wstring, std::map<std::wstring, std::wstring> > transformat
     //     }
     // }
 };
+
+
+inline bool isComingDown(Type a, Type b) { // a -> b
+    if (b.back() == '&' && a.back() != '&') return false;
+    if (a.back() == '&') {
+        a = a.substr(0, a.size() - 1);
+    }
+    if (b.back() == '&') {
+        b = b.substr(0, b.size() - 1);
+    }
+    return transformations[a].contains(b);
+}

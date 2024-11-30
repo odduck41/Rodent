@@ -1,6 +1,14 @@
 #include "TID.hpp"
 
+#include <algorithm>
+
 #include "exceptions.hpp"
+
+
+TID::TID() {
+    current = new Scope;
+    current->parent = nullptr;
+}
 
 void TID::nextScope() {
     const auto parent = current;
@@ -19,10 +27,20 @@ void TID::push(const Token& type, const Token& name) const {
     current->variables.insert({name.content, type.content});
 }
 
+void TID::push(const Type& type, const Token& name) const {
+    if (current->variables.contains({name.content, type})) throw redeclaration(name);
+    current->variables.insert({name.content, type});
+}
+
+
 Type TID::used(const Token& name) const {
     auto now = current;
     while (now != nullptr) {
-        if (const auto ptr = now->variables.find({name.content, L""}); ptr != now->variables.end())
+        if (const auto ptr =
+            std::ranges::find_if(now->variables,
+                                 [=](const Variable& x)
+                                 {return name.content == x.first;});
+            ptr != now->variables.end())
             return ptr->second;
         now = now->parent;
     }

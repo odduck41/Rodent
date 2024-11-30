@@ -10,13 +10,13 @@ inline bool isRvalue(const std::wstring& value) {
     return value[value.size() - 1] != '&';
 }
 
-std::wstring Value::rvalue() const {
-    if (isRvalue(type)) return type;
+std::wstring Value::lvalue() const {
+    if (isLvalue(type)) return type;
     return type + L"&";
 }
 
-std::wstring Value::lvalue() const {
-    if (isLvalue(type)) return type;
+std::wstring Value::rvalue() const {
+    if (isRvalue(type)) return type;
     return type.substr(0, type.size() - 1);
 }
 
@@ -71,7 +71,7 @@ void Semantic::checkUno() {
         if (swapped && !isLvalue(dynamic_cast<Value*>(a)->type)) throw bad_value(a);
     }
 
-    if (dynamic_cast<Value*>(a)->type == L"array" || dynamic_cast<Value*>(a)->type == L"str")
+    if (dynamic_cast<Value*>(a)->type.find(L"array") || dynamic_cast<Value*>(a)->type == L"str")
         throw wrong_operands(a);
 
     const auto element = new Value;
@@ -90,7 +90,7 @@ void Semantic::checkUno() {
     delete op;
 }
 
-Element* Semantic::push(const Token& token, const Operation::Val v = Operation::Val::rvalue) {
+Element* Semantic::push(const Token& token, const Operation::Val v) {
     if (token.type == Lexeme::Operation) return pushOperation(token, v);
     const auto literal = new Value;
     literal->content = token.content;
@@ -114,6 +114,12 @@ Element* Semantic::push(const std::wstring& type, const size_t line) {
 
 Type Semantic::top() {
     return dynamic_cast<Value*>(elements.top())->type;
+}
+
+void Semantic::pop() {
+    const auto ptr = elements.top();
+    elements.pop();
+    delete ptr;
 }
 
 Element* Semantic::pushOperation(const Token& operation, const Operation::Val v) {
