@@ -632,7 +632,11 @@ bool Parser::op11(const std::wstring& s) {
 void Parser::expr11_() {
     size_t amount = 0;
     while (now.type == Lexeme::Operation) {
-        if (!op11(now.content)) goto end;
+        if (!op11(now.content)) {
+            if (now.type != Lexeme::Identifier && now.type != Lexeme::Literal)
+                throw bad_lexeme(now, filename_);
+            goto end;
+        }
         ++amount;
         if (now.content.size() == 2) {
             expressions.push(now, Operation::Val::lvalue);
@@ -641,10 +645,8 @@ void Parser::expr11_() {
         }
         get();
     }
-    if (now.type != Lexeme::Identifier && now.type != Lexeme::Literal)
-        throw bad_lexeme(now, filename_);
-    expr12_();
     end:
+    expr12_();
     while (amount--) expressions.checkUno();
 }
 

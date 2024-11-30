@@ -5,4 +5,6 @@ func sum(int a, int b) -> int {
 
 func main() -> int {
     int a = 4, b = 4 + a, c, d = sum(a, b), e, j = 324 + 3, k;
+    int& c = a;
+    array<int> tc = [a, b, c + 4, 3];
 }
