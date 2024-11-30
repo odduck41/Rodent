@@ -433,14 +433,26 @@ void Parser::expr_() {
 }
 
 void Parser::expr0_() {
+    size_t amount = 0;
     expr1_();
     while (now.type == Lexeme::Punctuation) {
-        if (now.content != L",") return;
+        if (now.content != L",") goto end;
+        ++amount;
+        auto e = expressions.push(now);
         get();
         expr1_();
+        auto res = expressions.top();
+        expressions.pop();
+        if (res.back() == '&') {
+            dynamic_cast<Operation*>(e)->result = Operation::Val::lvalue;
+        } else {
+            dynamic_cast<Operation*>(e)->result = Operation::Val::rvalue;
+        }
     }
 
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
+    end:
+    while (amount--) expressions.checkBin();
 }
 
 bool Parser::op1(const std::wstring& s) {
@@ -451,69 +463,99 @@ bool Parser::op1(const std::wstring& s) {
 }
 
 void Parser::expr1_() {
+    size_t amount = 0;
     expr2_();
     while (now.type == Lexeme::Operation) {
-        if (!op1(now.content)) return;
+        if (!op1(now.content)) goto end;
+        ++amount;
+        expressions.push(now, Operation::Val::lvalue);
         get();
         expr2_();
     }
 
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
+    end:
+    while (amount--) expressions.checkBin();
 }
 
 void Parser::expr2_() {
+    size_t amount = 0;
     expr3_();
     while (now.type == Lexeme::Operation) {
-        if (now.content != L"||") return;
+        if (now.content != L"||") goto end;
+        ++amount;
+        expressions.push(now);
         get();
         expr3_();
     }
 
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
+    end:
+    while (amount--) expressions.checkBin();
 }
 
 void Parser::expr3_() {
+    size_t amount = 0;
     expr4_();
     while (now.type == Lexeme::Operation) {
-        if (now.content != L"&&") return;
+        if (now.content != L"&&") goto end;
+        ++amount;
+        expressions.push(now);
         get();
         expr4_();
     }
 
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
+    end:
+    while (amount--) expressions.checkBin();
 }
 
 void Parser::expr4_() {
+    size_t amount = 0;
     expr5_();
     while (now.type == Lexeme::Operation) {
-        if (now.content != L"|") return;
+        if (now.content != L"|") goto end;
+        ++amount;
+        expressions.push(now);
         get();
         expr5_();
     }
 
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
+    end:
+    while (amount--) expressions.checkBin();
 }
 
 void Parser::expr5_() {
+    size_t amount = 0;
     expr6_();
     while (now.type == Lexeme::Operation) {
-        if (now.content != L"&") return;
+        if (now.content != L"&") goto end;
+        ++amount;
+        expressions.push(now);
         get();
         expr6_();
     }
 
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
+    end:
+    while (amount--) expressions.checkBin();
 }
 
 void Parser::expr6_() {
+    size_t amount = 0;
     expr7_();
     while (now.type == Lexeme::Operation) {
-        if (now.content != L"==" && now.content != L"!=") return;
+        if (now.content != L"==" && now.content != L"!=") goto end;
+        ++amount;
+        expressions.push(now);
         get();
         expr7_();
     }
 
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
+    end:
+    while (amount--) expressions.checkBin();
 }
 
 bool Parser::op7(const std::wstring& s) {
@@ -521,46 +563,66 @@ bool Parser::op7(const std::wstring& s) {
 }
 
 void Parser::expr7_() {
+    size_t amount = 0;
     expr8_();
     while (now.type == Lexeme::Operation) {
-        if (!op7(now.content)) return;
+        if (!op7(now.content))  goto end;
+        ++amount;
+        expressions.push(now);
         get();
         expr8_();
     }
 
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
+    end:
+    while (amount--) expressions.checkBin();
 }
 
 void Parser::expr8_() {
+    size_t amount = 0;
     expr9_();
     while (now.type == Lexeme::Operation) {
-        if (now.content != L">>" && now.content != L"<<") return;
+        if (now.content != L">>" && now.content != L"<<") goto end;
+        ++amount;
+        expressions.push(now);
         get();
         expr9_();
     }
 
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
+    end:
+    while (amount--) expressions.checkBin();
 }
 
 void Parser::expr9_() {
+    size_t amount = 0;
     expr10_();
     while (now.type == Lexeme::Operation) {
-        if (now.content != L"+" && now.content != L"-") return;
+        if (now.content != L"+" && now.content != L"-") goto end;
+        ++amount;
+        expressions.push(now);
         get();
         expr10_();
     }
 
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
+    end:
+    while (amount--) expressions.checkBin();
 }
 
 void Parser::expr10_() {
+    size_t amount = 0;
     expr11_();
     while (now.type == Lexeme::Operation) {
-        if (now.content != L"*" && now.content != L"/" && now.content != L"%") return;
+        if (now.content != L"*" && now.content != L"/" && now.content != L"%") goto end;
+        ++amount;
+        expressions.push(now);
         get();
         expr11_();
     }
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
+    end:
+    while (amount--) expressions.checkBin();
 }
 
 bool Parser::op11(const std::wstring& s) {
@@ -568,22 +630,36 @@ bool Parser::op11(const std::wstring& s) {
 }
 
 void Parser::expr11_() {
+    size_t amount = 0;
     while (now.type == Lexeme::Operation) {
-        if (!op11(now.content)) break;
+        if (!op11(now.content)) goto end;
+        ++amount;
+        if (now.content.size() == 2) {
+            expressions.push(now, Operation::Val::lvalue);
+        } else {
+            expressions.push(now);
+        }
         get();
     }
     if (now.type != Lexeme::Identifier && now.type != Lexeme::Literal)
         throw bad_lexeme(now, filename_);
     expr12_();
+    end:
+    while (amount--) expressions.checkUno();
 }
 
 void Parser::expr12_() {
+    size_t amount = 0;
     expr13_();
-    while (now.type == Lexeme::Operation) {
-        if (now.content != L"++" && now.content != L"--") break;
+    if (now.type == Lexeme::Operation) {
+        if (now.content != L"++" && now.content != L"--") goto end;
+        ++amount;
+        expressions.push(now);
         get();
     }
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
+    end:
+    if (amount--) expressions.checkUno();
 }
 
 void Parser::expr13_() {
@@ -625,12 +701,11 @@ void Parser::atom() {
     }
     auto var = now;
     get();
-    if (now.type == Lexeme::Operation) return;
-    if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
-    if (now.type != Lexeme::OpenParentheses) {
+    if (now.type == Lexeme::Operation || now.type != Lexeme::OpenParentheses) {
         expressions.push(variables.used(var), var.line);
         return;
-    };
+    }
+    if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
     functionCall_(var);
     get();
 }

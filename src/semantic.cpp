@@ -10,13 +10,13 @@ inline bool isRvalue(const std::wstring& value) {
     return value[value.size() - 1] != '&';
 }
 
-std::wstring Value::rvalue() const {
-    if (isRvalue(type)) return type;
+std::wstring Value::lvalue() const {
+    if (isLvalue(type)) return type;
     return type + L"&";
 }
 
-std::wstring Value::lvalue() const {
-    if (isLvalue(type)) return type;
+std::wstring Value::rvalue() const {
+    if (isRvalue(type)) return type;
     return type.substr(0, type.size() - 1);
 }
 
