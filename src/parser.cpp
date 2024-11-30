@@ -442,7 +442,6 @@ void Parser::expr0_() {
         get();
         expr1_();
         auto res = expressions.top();
-        expressions.pop();
         if (res.back() == '&') {
             dynamic_cast<Operation*>(e)->result = Operation::Val::lvalue;
         } else {
@@ -690,13 +689,15 @@ void Parser::expr13_() {
 
 void Parser::atom() {
     if (now.type != Lexeme::Identifier && now.type != Lexeme::Literal && now.type != Lexeme::StringLiteral) {
-        if (now.content == L"(") get();
-        while (now.content != L")") {
-            inline_expression();
-            if (now.content != L",") throw bad_lexeme(now, filename_);
+        if (now.content == L"(") {
             get();
+            expr_();
+            if (now.content != L")") throw bad_lexeme(now, filename_);
+            get();
+        } else {
+            throw bad_lexeme(now, filename_);
         }
-        if (now.content != L")") throw bad_lexeme(now, filename_);
+        return;
     }
     if (now.type == Lexeme::Literal || now.type == Lexeme::StringLiteral) {
         expressions.push(now);

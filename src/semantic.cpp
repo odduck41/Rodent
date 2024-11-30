@@ -91,7 +91,8 @@ void Semantic::checkUno() {
 }
 
 Element* Semantic::push(const Token& token, const Operation::Val v) {
-    if (token.type == Lexeme::Operation) return pushOperation(token, v);
+    if (token.type == Lexeme::Operation
+        || token.type == Lexeme::Punctuation) return pushOperation(token, v);
     const auto literal = new Value;
     literal->content = token.content;
     if (token.type == Lexeme::Literal) {
