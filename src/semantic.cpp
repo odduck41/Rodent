@@ -25,11 +25,11 @@ bool requireLvalue(const std::wstring& op) {
 }
 
 void Semantic::checkBin() {
-    const auto a = dynamic_cast<Value*>(elements.top());
+    const auto b = dynamic_cast<Value*>(elements.top());
     elements.pop();
     const auto op = dynamic_cast<Operation*>(elements.top());
     elements.pop();
-    const auto b = dynamic_cast<Value*>(elements.top());
+    const auto a = dynamic_cast<Value*>(elements.top());
     elements.pop();
     if (a == nullptr ||
         b == nullptr ||
@@ -70,17 +70,17 @@ void Semantic::checkUno() {
     if (op->content.size() == 2) {
         if (swapped && !isLvalue(dynamic_cast<Value*>(a)->type)) throw bad_value(a);
     }
-
-    if (dynamic_cast<Value*>(a)->type.find(L"array") || dynamic_cast<Value*>(a)->type == L"str")
+    if (dynamic_cast<Value*>(a)->type.contains(L"array")
+        || dynamic_cast<Value*>(a)->type == L"str")
         throw wrong_operands(a);
 
     const auto element = new Value;
     if (swapped) {
-        element->content = op->content + a->content;
-        element->type = dynamic_cast<Value *>(a)->lvalue();
-    } else {
         element->content = a->content + op->content;
         element->type = dynamic_cast<Value *>(a)->rvalue();
+    } else {
+        element->content = op->content + a->content;
+        element->type = dynamic_cast<Value *>(a)->lvalue();
     }
     element->line = op->line;
 
@@ -103,10 +103,11 @@ Element* Semantic::push(const Token& token, const Operation::Val v) {
     return literal;
 }
 
-Element* Semantic::push(const std::wstring& type, const size_t line) {
+Element* Semantic::push(const Type& type, const size_t line, const std::wstring& name) {
     const auto variable = new Value;
     variable->type = type + L"&";
     variable->line = line;
+    variable->content = name;
 
     elements.push(variable);
     return variable;

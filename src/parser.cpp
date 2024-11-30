@@ -370,12 +370,12 @@ void Parser::definition_(std::wstring type) {
     if (!isComingDown(expressions.top(), type))
         throw bad_type(expressions.top(), now.line);
     expressions.pop();
+    variables.push(type, name);
 
     if (now.type == Lexeme::Semicolon) return;
     if (now.type == Lexeme::Punctuation) {
         if (now.content != L",") throw bad_lexeme(now, filename_);
     }
-    variables.push(type, name);
     definition_(type);
 }
 
@@ -704,7 +704,7 @@ void Parser::atom() {
     auto var = now;
     get();
     if (now.type == Lexeme::Operation || now.type != Lexeme::OpenParentheses) {
-        expressions.push(variables.used(var), var.line);
+        expressions.push(variables.used(var), var.line, var.content);
         return;
     }
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
