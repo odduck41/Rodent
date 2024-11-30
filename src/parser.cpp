@@ -376,7 +376,7 @@ void Parser::definition_(std::wstring type) {
         if (now.content != L",") throw bad_lexeme(now, filename_);
     }
     variables.push(type, name);
-    definition_();
+    definition_(type);
 }
 
 void Parser::array_definition_() {
@@ -629,6 +629,7 @@ void Parser::atom() {
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
     if (now.type != Lexeme::OpenParentheses) {
         expressions.push(variables.used(var), var.line);
+        return;
     };
     functionCall_(var);
     get();

@@ -37,8 +37,9 @@ Type TID::used(const Token& name) const {
     auto now = current;
     while (now != nullptr) {
         if (const auto ptr =
-            std::find_if(now->variables.begin(), now->variables.end(),
-                [=](const Variable& x){return name.content == x.first;});
+            std::ranges::find_if(now->variables,
+                                 [=](const Variable& x)
+                                 {return name.content == x.first;});
             ptr != now->variables.end())
             return ptr->second;
         now = now->parent;
