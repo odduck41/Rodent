@@ -121,7 +121,7 @@ inline std::map<Type, std::map<Type, Type>> transformations = {
 };
 
 
-inline bool isComingDown(Type a, Type b) {
+inline bool isComingDown(Type a, Type b) { // a -> b
     if (b.back() == '&' && a.back() != '&') return false;
     if (a.back() == '&') {
         a = a.substr(0, a.size() - 1);

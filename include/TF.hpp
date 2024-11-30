@@ -12,16 +12,13 @@ public:
     Function(const Token&, const std::vector<Type>&);
     [[nodiscard]] Name getName() const;
     [[nodiscard]] Type getType() const;
+    bool operator==(const Function&) const;
+    bool operator<(const Function&) const;
 private:
     Type type_{};
     std::vector<Type> args_{};
     Name name_{};
-    friend bool operator==(const Function&, const Function&);
-    friend bool operator<(const Function&, const Function&);
 };
-
-bool operator==(const Function&, const Function&);
-bool operator<(const Function&, const Function&);
 
 class TF {
 public:

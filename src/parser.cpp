@@ -327,7 +327,7 @@ void Parser::if_() {
 void Parser::return_() {
     get();
     expression_();
-    if (isComingDown(expressions.top(), functions.getLastType()))
+    if (!isComingDown(expressions.top(), functions.getLastType()))
         throw bad_return(expressions.top(), functions.getLastType(), now.line);
     expressions.pop();
 }
@@ -645,12 +645,12 @@ void Parser::functionCall_(const Token& name) {
 
 void Parser::given_(std::vector<Type>& args) {
     if (now.type == Lexeme::CloseParentheses) return;
-    expr_();
+    inline_expression();
     args.push_back(expressions.top());
     expressions.pop();
     while (now.content == L",") {
         get();
-        expr_();
+        inline_expression();
         args.push_back(expressions.top());
         expressions.pop();
     }

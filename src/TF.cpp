@@ -35,16 +35,22 @@ Type Function::getType() const {
     return type_;
 }
 
-bool operator==(const Function& a, const Function& b) {
-    return a.name_ == b.name_ && std::equal(a.args_.begin(), a.args_.end(), b.args_.begin());
+bool Function::operator==(const Function& other) const {
+    if (this->args_.size() != other.args_.size() || this->name_ != other.name_) return false;
+    bool comingDown = true;
+    for (size_t i = 0; i < this->args_.size(); ++i) {
+        comingDown &= isComingDown(other.args_[i], this->args_[i]);
+        if (!comingDown) break;
+    }
+    return comingDown;
 }
 
-bool operator<(const Function& a, const Function& b) {
-    if (a.name_ < b.name_) return true;
-    if (a.type_ < b.type_) return true;
-    if (a.args_.size() < b.args_.size()) return true;
-    for (size_t i = 0; i < a.args_.size(); ++i) {
-        if (a.args_[i] >= b.args_[i]) return false;
+bool Function::operator<(const Function& other) const {
+    if (this->name_ < other.name_) return true;
+    if (this->type_ < other.type_) return true;
+    if (this->args_.size() != other.args_.size()) return false;
+    for (size_t i = 0; i < this->args_.size(); ++i) {
+        if (this->args_[i] >= other.args_[i]) return false;
     }
     return true;
 }
@@ -56,7 +62,9 @@ void TF::push(const Token& type, const Token& name, const std::vector<Token>& ar
 }
 
 Type TF::used(const Token& name, const std::vector<Type>& args) {
-    if (const auto ptr = functions.find({name, args}); ptr != functions.end()) return ptr->getType();
+    if (const auto ptr = std::ranges::find_if(functions, [=](const Function& a) {
+        return a == Function{name, args};
+    }); ptr != functions.end()) return ptr->getType();
     throw undefined(name, 0);
 }
 

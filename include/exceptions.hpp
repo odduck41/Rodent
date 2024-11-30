@@ -195,7 +195,7 @@ public:
         message_ += a;
         message_ += L" at line ";
         message_ += std::to_wstring(line);
-        message_ += L"is not coming down to the function type ";
+        message_ += L" is not coming down to the function type ";
         message_ += b;
     };
     [[nodiscard]] const wchar_t* what(int) const noexcept override {
