@@ -370,12 +370,12 @@ void Parser::definition_(std::wstring type) {
     if (!isComingDown(expressions.top(), type))
         throw bad_type(expressions.top(), now.line);
     expressions.pop();
+    variables.push(type, name);
 
     if (now.type == Lexeme::Semicolon) return;
     if (now.type == Lexeme::Punctuation) {
         if (now.content != L",") throw bad_lexeme(now, filename_);
     }
-    variables.push(type, name);
     definition_(type);
 }
 
@@ -442,7 +442,6 @@ void Parser::expr0_() {
         get();
         expr1_();
         auto res = expressions.top();
-        expressions.pop();
         if (res.back() == '&') {
             dynamic_cast<Operation*>(e)->result = Operation::Val::lvalue;
         } else {
@@ -661,7 +660,9 @@ void Parser::expr12_() {
     }
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
     end:
-    if (amount--) expressions.checkUno();
+    if (amount) {
+        expressions.checkUno();
+    }
 }
 
 void Parser::expr13_() {
@@ -688,13 +689,15 @@ void Parser::expr13_() {
 
 void Parser::atom() {
     if (now.type != Lexeme::Identifier && now.type != Lexeme::Literal && now.type != Lexeme::StringLiteral) {
-        if (now.content == L"(") get();
-        while (now.content != L")") {
-            inline_expression();
-            if (now.content != L",") throw bad_lexeme(now, filename_);
+        if (now.content == L"(") {
             get();
+            expr_();
+            if (now.content != L")") throw bad_lexeme(now, filename_);
+            get();
+        } else {
+            throw bad_lexeme(now, filename_);
         }
-        if (now.content != L")") throw bad_lexeme(now, filename_);
+        return;
     }
     if (now.type == Lexeme::Literal || now.type == Lexeme::StringLiteral) {
         expressions.push(now);
@@ -704,7 +707,7 @@ void Parser::atom() {
     auto var = now;
     get();
     if (now.type == Lexeme::Operation || now.type != Lexeme::OpenParentheses) {
-        expressions.push(variables.used(var), var.line);
+        expressions.push(variables.used(var), var.line, var.content);
         return;
     }
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
