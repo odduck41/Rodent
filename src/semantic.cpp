@@ -106,9 +106,10 @@ Element* Semantic::push(const Token& token, const Operation::Val v) {
 
 Element* Semantic::push(const Type& type, const size_t line, const std::wstring& name) {
     const auto variable = new Value;
-    variable->type = type + L"&";
+    variable->type = type;
     variable->line = line;
     variable->content = name;
+    variable->type = variable->lvalue();
 
     elements.push(variable);
     return variable;

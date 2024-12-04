@@ -112,12 +112,12 @@ inline std::map<Type, std::map<Type, Type>> transformations = {
             }
     },
 
-    // {L"str",
-    //     {
-    //         {L"str", L"str"},
-    //         {L"char", L"str"}
-    //     }
-    // }
+    {L"str",
+        {
+        {L"str", L"str"},
+        {L"char", L"str"}
+      }
+    }
 };
 
 
