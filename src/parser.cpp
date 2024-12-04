@@ -719,7 +719,7 @@ void Parser::functionCall_(const Token& name) {
     std::vector<Type> args;
     get();
     given_(args);
-    expressions.push(functions.used(name, args), name.line);
+    expressions.push(functions.used(name, args), name.line, name.content, true);
     if (now.type != Lexeme::CloseParentheses) throw bad_lexeme(now, filename_);
 }
 

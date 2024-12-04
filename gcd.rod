@@ -8,6 +8,7 @@ func a(int f) -> int {
 }
 
 func main(int e) -> int {
-    int& t = a(1);
+    double f;
+    int t = a(f);
     return t + 11;
 }
