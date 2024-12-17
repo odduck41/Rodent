@@ -111,12 +111,12 @@ private:
 class bad_operator final : public exception {
 public:
     explicit bad_operator(const Element* a, const Element* op, const Element* b) {
-        message_ += L"Expected, that ";
-        message_ += a->content;
-        message_ += L" is a value, ";
+        // message_ += L"Expected, that ";
+        // message_ += a->content;
+        // message_ += L" is a value, ";
         message_ += op->content;
-        message_ += L" is an operation and ";
-        message_ += b->content;
+        // message_ += L" is an operation and ";
+        // message_ += b->content;
         message_ += L" is also a value, but they don't. Line: ";
         message_ += std::to_wstring(op->line);
     }

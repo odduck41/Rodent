@@ -70,11 +70,24 @@ void Semantic::checkUno() {
     if (op->content.size() == 2) {
         if (!swapped && !isLvalue(dynamic_cast<Value*>(a)->type)) throw bad_value(a);
     }
-    if (dynamic_cast<Value*>(a)->type.contains(L"array")
-        || dynamic_cast<Value*>(a)->type == L"str")
-        throw wrong_operands(a);
 
     const auto element = new Value;
+    if (dynamic_cast<Value*>(a)->type == L"str") {
+        if (op->content != L"]") {
+            throw wrong_operands(a);
+        }
+        element->type = L"char";
+        element->line = a->line;
+        element->content = a->content + op->content;
+        elements.push(element);
+    }
+    if (dynamic_cast<Value*>(a)->type.contains(L"array")) {
+        if (op->content != L"]") {
+            throw wrong_operands(a);
+        }
+
+    }
+
     if (swapped) {
         element->content = a->content + op->content;
         element->type = dynamic_cast<Value*>(a)->rvalue();

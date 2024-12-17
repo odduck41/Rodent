@@ -670,20 +670,16 @@ void Parser::expr13_() {
 
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
 
-    if (now.content == L".") {
-        get();
-        if (now.type != Lexeme::Identifier) return;
-        get();
-        return;
-    }
-
     if (now.content != L"[") return;
     get();
     expr_();
-
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
-
+    if (expressions.top() != L"int" || expressions.top() != L"int&") {
+        throw bad_type(nw);
+    }
+    expressions.push(now, Operation::Val::lvalue);
     if (now.content != L"]") return;
+    expressions.checkUno();
     get();
 }
 
