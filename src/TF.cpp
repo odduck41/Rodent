@@ -37,6 +37,14 @@ Type Function::getType() const {
 
 bool Function::operator==(const Function& other) const {
     if (this->args_.size() != other.args_.size() || this->name_ != other.name_) return false;
+    bool equal = true;
+    for (size_t i = 0; i < this->args_.size(); ++i) {
+        equal &= other.args_[i] == this->args_[i];
+        if (!equal) break;
+    }
+
+    if (equal) return true;
+
     bool comingDown = true;
     for (size_t i = 0; i < this->args_.size(); ++i) {
         comingDown &= isComingDown(other.args_[i], this->args_[i]);
