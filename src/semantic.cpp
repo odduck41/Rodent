@@ -104,11 +104,12 @@ Element* Semantic::push(const Token& token, const Operation::Val v) {
     return literal;
 }
 
-Element* Semantic::push(const Type& type, const size_t line, const std::wstring& name) {
+Element* Semantic::push(const Type& type, const size_t line, const std::wstring& name, bool f) {
     const auto variable = new Value;
-    variable->type = type + L"&";
+    variable->type = type;
     variable->line = line;
     variable->content = name;
+    if (!f) variable->type = variable->lvalue();
 
     elements.push(variable);
     return variable;
