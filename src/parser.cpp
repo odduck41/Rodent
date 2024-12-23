@@ -111,7 +111,18 @@ void Parser::functionDefinition_() {
 void Parser::arguments_(std::vector<Token>& types) {
     if (now.type != Lexeme::Type) throw bad_lexeme(now, filename_);
     auto type = now;
-    types.push_back(now);
+    if (type.content == L"array") {
+        get();
+        if (now.content != L"<") throw bad_lexeme(now, filename_);
+        type.content += L"<";
+        get();
+        if (now.type != Lexeme::Type) throw bad_lexeme(now, filename_);
+        type.content += now.content;
+        get();
+        if (now.content != L">") throw bad_lexeme(now, filename_);
+        type.content += L">";
+    }
+    types.push_back(type);
     get();
     if (now.type != Lexeme::Identifier) throw bad_lexeme(now, filename_);
     variables.push(type, now);
@@ -326,6 +337,9 @@ void Parser::if_() {
 
 void Parser::return_() {
     get();
+    if (functions.getLastType() == L"void" && now.type == Lexeme::Semicolon) {
+        return;
+    }
     expression_();
     if (!isComingDown(expressions.top(), functions.getLastType()))
         throw bad_return(expressions.top(), functions.getLastType(), now.line);
@@ -674,12 +688,32 @@ void Parser::expr13_() {
     get();
     expr_();
     if (now.type == Lexeme::Other) throw bad_lexeme(now, filename_);
-    if (expressions.top() != L"int" || expressions.top() != L"int&") {
-        throw bad_type(nw);
+    if (expressions.top() != L"int" && expressions.top() != L"int&") {
+        throw bad_type(now);
     }
-    expressions.push(now, Operation::Val::lvalue);
-    if (now.content != L"]") return;
-    expressions.checkUno();
+    expressions.pop();
+    if (now.content != L"]") throw bad_lexeme(now, filename_);
+    if (expressions.top().contains(L"str")) {
+        expressions.pop();
+        expressions.push(L"char&", now.line);
+        return;
+    }
+    if (expressions.top().find(L"array") == std::string::npos) throw bad_lexeme(now, filename_);
+    auto all = expressions.top();
+    auto type = all;
+    while (*type.begin() != '<') {
+        type.erase(type.begin());
+    }
+    type.erase(type.begin());
+    type.erase(--type.end());
+    if (type.back() == '&') {
+        type.erase(--type.end());
+    }
+    expressions.pop();
+    if (type.back() != '&') {
+        type += L"&";
+    }
+    expressions.push(type, now.line);
     get();
 }
 

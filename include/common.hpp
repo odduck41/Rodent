@@ -53,7 +53,7 @@ inline void l(const std::vector<Token>& tokens) {
     os << L"}\n";
 }
 
-static void doAll(const std::string& filename = filename) {
+static void doAll(const std::string& filename) {
     // loadReserved();
     // loadTypes();
 
@@ -98,5 +98,5 @@ inline void doFlags(const int argc, const char** argv) {
   next:;
   }
   split();
-  doAll();
+  doAll(filename);
 }

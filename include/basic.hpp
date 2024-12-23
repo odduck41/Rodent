@@ -112,11 +112,11 @@ inline std::map<Type, std::map<Type, Type>> transformations = {
             }
     },
 
-    {L"str",
+{L"str",
         {
             {L"str", L"str"},
             {L"char", L"str"}
-        }
+        },
     }
 };
 
@@ -129,5 +129,5 @@ inline bool isComingDown(Type a, Type b) { // a -> b
     if (b.back() == '&') {
         b = b.substr(0, b.size() - 1);
     }
-    return transformations[a].contains(b);
+    return a == b || transformations[a].contains(b);
 }

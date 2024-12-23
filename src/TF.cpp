@@ -1,4 +1,5 @@
 #include "TF.hpp"
+#include "algorithm"
 
 #include "exceptions.hpp"
 
