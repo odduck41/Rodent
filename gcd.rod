@@ -1,4 +1,19 @@
+func array_sum(array<int> arr, int size) -> int {
+    int result = 0;
+
+    for (int i = 0; i < size; ++i){
+      result += arr[i];
+    }
+
+    return result;
+}
+
+
 func main() -> int {
-    str a = "Hello";
-    char e = a[0];
+  array<int> a = [1, 2, 4, 2, 54, -2];
+  int a_size = 6;
+
+  int res = array_sum(a, a_size);
+  int res_2 = array_sum(a, a_size) * 2;
+  int res_res = array_sum(a, a_size) * array_sum(a, a_size) + 1;
 }

@@ -705,10 +705,10 @@ void Parser::expr13_() {
         type.erase(type.begin());
     }
     type.erase(type.begin());
-    type.erase(--type.end());
     if (type.back() == '&') {
         type.erase(--type.end());
     }
+    type.erase(--type.end());
     expressions.pop();
     if (type.back() != '&') {
         type += L"&";
