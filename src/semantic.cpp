@@ -85,7 +85,6 @@ void Semantic::checkUno() {
         if (op->content != L"]") {
             throw wrong_operands(a);
         }
-
     }
 
     if (swapped) {

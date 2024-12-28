@@ -1,3 +1,4 @@
+int a = 1;
 func array_sum(array<int> arr, int size) -> int {
     int result = 0;
 
@@ -8,12 +9,41 @@ func array_sum(array<int> arr, int size) -> int {
     return result;
 }
 
+func d(int a) -> int {
+    str k = "kek";
+
+    if (1 > 0) {
+        return 1 + 1;
+    }
+
+    return 1;
+}
+
 
 func main() -> int {
+  a += 1;
   array<int> a = [1, 2, 4, 2, 54, -2];
+  for (int i = 0; i < 0; ++i) {
+    str a = " ";
+  }
   int a_size = 6;
-
+  int k;
+  switch (a_size) {
+     case 1:
+        str i = "odd";
+     case 2:
+        str i = "even";
+     case 3:
+        str i = "odd";
+     case 4:
+        str i = "even";
+     default:
+        int a_size = - 1;
+  }
+  str kek = "kek";
   int res = array_sum(a, a_size);
-  int res_2 = array_sum(a, a_size) * 2;
+  int res_2 = array_sum(a, a_size) * d(2) + d(1);
   int res_res = array_sum(a, a_size) * array_sum(a, a_size) + 1;
+  str e;
+ 
 }

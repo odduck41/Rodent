@@ -144,7 +144,7 @@ private:
     std::wstring message_;
 };
 
-class wrong_operands final : exception {
+class wrong_operands final : public exception {
 public:
     explicit wrong_operands(const Element* a, const Element* b) {
         message_ = L"Incongruous types of ";
@@ -194,7 +194,7 @@ public:
         message_ += L"Return type ";
         message_ += a;
         message_ += L" at line ";
-        message_ += std::to_wstring(line);
+        message_ += std::to_wstring(line - 1);
         message_ += L" is not coming down to the function type ";
         message_ += b;
     };

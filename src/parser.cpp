@@ -146,6 +146,13 @@ void Parser::body_() {
 }
 
 void Parser::inline_body_() {
+    variables.nextScope();
+    body_();
+    get();
+    variables.exitScope();
+}
+
+void Parser::for_body_() {
     body_();
     get();
 }
@@ -179,6 +186,7 @@ void Parser::inline_expression() {
 }
 
 void Parser::switch_() {
+    variables.nextScope();
     get();
     if (now.type != Lexeme::OpenParentheses) throw bad_lexeme(now, filename_);
     get();
@@ -202,6 +210,7 @@ void Parser::switch_() {
         }
     }
     get();
+    variables.exitScope();
 }
 
 void Parser::case_(const Type& type) {
@@ -213,7 +222,9 @@ void Parser::case_(const Type& type) {
     get();
     if (now.type != Lexeme::Operation || now.content != L":") throw bad_lexeme(now, filename_);
     get();
+    variables.nextScope();
     case_body_();
+    variables.exitScope();
 }
 
 void Parser::case_body_() {
@@ -255,6 +266,7 @@ void Parser::doWhile_() {
 }
 
 void Parser::for_() {
+    variables.nextScope();
     get();
     if (now.type != Lexeme::OpenParentheses) throw bad_lexeme(now, filename_);
 
@@ -285,7 +297,8 @@ void Parser::for_() {
     get();
     if (now.type != Lexeme::OpenCurly) throw bad_lexeme(now, filename_);
 
-    inline_body_();
+    for_body_();
+    variables.exitScope();
 }
 
 void Parser::while_() {

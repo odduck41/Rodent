@@ -28,7 +28,9 @@ void TID::push(const Token& type, const Token& name) const {
 }
 
 void TID::push(const Type& type, const Token& name) const {
-    if (current->variables.contains({name.content, type})) throw redeclaration(name);
+    bool c = std::ranges::find_if(current->variables,[=](const Variable& x)
+                                 {return name.content == x.first;}) != current->variables.end();
+    if (c) throw redeclaration(name);
     current->variables.insert({name.content, type});
 }
 
